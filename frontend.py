@@ -5,69 +5,13 @@ from pydantic import BaseModel
 from typing import List
 from pdf_builder import generate_pdf
 
-# --- THE NATIVE PREMIUM AESTHETIC THEME ENGINE ---
+# --- CLEAN ENTERPRISE CONFIGURATION ---
 st.set_page_config(
     page_title="Quick Quote AI - Premium Console", 
     page_icon="🏗️", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
-# Raw CSS injection to create an elite, modernist software dashboard design
-st.markdown("""
-    <style>
-        /* Modernist Radial Background Matrix */
-        .stApp {
-            background: radial-gradient(circle, #0A192F 0%, #020C1B 100%) !important;
-            color: #F4F6F9 !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-        
-        /* Sidebar Polish */
-        section[data-testid="stSidebar"] {
-            background-color: #020C1B !important;
-            border-right: 1px solid #1E293B;
-        }
-        
-        /* Floating Glassmorphic Container Cards */
-        div[data-testid="stForm"], .stAlert, div.element-container div.stMarkdown div {
-            background: rgba(13, 27, 42, 0.65) !important;
-            border: 1px solid #FF6B35 !important;
-            border-radius: 12px !important;
-            padding: 25px !important;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
-        }
-        
-        /* Neon Button Styling Rules */
-        div.stButton > button:first-child {
-            background: linear-gradient(135deg, #FF6B35 0%, #D9534F 100%) !important;
-            color: white !important;
-            border-radius: 8px !important;
-            border: none !important;
-            font-weight: 700 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 1px !important;
-            transition: all 0.3s ease !important;
-            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4) !important;
-        }
-        div.stButton > button:first-child:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6) !important;
-        }
-        
-        /* Polished Form Inputs */
-        input, select, textarea {
-            background-color: #020C1B !important;
-            color: white !important;
-            border: 1px solid #1E293B !important;
-            border-radius: 6px !important;
-        }
-        input:focus {
-            border-color: #FF6B35 !important;
-            box-shadow: 0 0 10px rgba(255, 107, 53, 0.5) !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
 
 # --- INITIALIZE TRIAL VALUE HUD COUNTER ---
 if 'quotes_used' not in st.session_state:
@@ -79,7 +23,7 @@ remaining_quotes = FREE_LIMIT - st.session_state['quotes_used']
 # --- SIDEBAR HUD DISPLAY ---
 st.sidebar.image("https://icons8.com", width=65)
 st.sidebar.title("Quick Quote AI")
-st.sidebar.markdown(f"**⚡ System Status:** <span style='color:#FF6B35;font-weight:bold;'>PRO BETA</span>", unsafe_allow_html=True)
+st.sidebar.markdown(f"**⚡ System Status:** `PRO BETA`")
 st.sidebar.markdown(f"**📊 Usage Allocation:** `{remaining_quotes} / {FREE_LIMIT} Remaining`")
 st.sidebar.markdown("---")
 
@@ -104,17 +48,23 @@ class AIQuoteResponse(BaseModel):
 # MONITOR 1: BRAND SALES LANDING SUMMARY
 # =========================================================
 if page_selection == "🏠 Platform Overview":
-    st.markdown("<h1 style='text-align: center; color: white;'>🏗️ Stop Losing Construction Deals to Slow Estimates</h1>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align: center; color: #FF6B35;'>Close residential clients directly from the driveway in under 30 seconds.</h3>", unsafe_allow_html=True)
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.title("🏗️ Stop Losing Construction Deals to Slow Estimates")
+    st.subheader("Close residential clients directly from the driveway in under 30 seconds.")
+    st.write("")
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown("<div style='background:rgba(13,27,42,0.4);border-left:4px solid #FF6B35;padding:20px;border-radius:8px;'><h3>⚡ 30-Second Quotes</h3><p>Ditch evening paperwork. Type parameters right at the job site and let regional AI models construct cost itemizations instantly.</p></div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("### ⚡ 30-Second Quotes")
+            st.write("Ditch evening paperwork. Type parameters right at the job site and let regional AI models construct cost itemizations instantly.")
     with col2:
-        st.markdown("<div style='background:rgba(13,27,42,0.4);border-left:4px solid #FF6B35;padding:20px;border-radius:8px;'><h3>🧾 Zero Speculation</h3><p>Build massive customer trust. Hand your client a transparent material and labor breakdown that removes price haggling completely.</p></div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("### 🧾 Zero Speculation")
+            st.write("Build massive customer trust. Hand your client a transparent material and labor breakdown that removes price haggling completely.")
     with col3:
-        st.markdown("<div style='background:rgba(13,27,42,0.4);border-left:4px solid #FF6B35;padding:20px;border-radius:8px;'><h3>📥 Instant PDF Delivery</h3><p>Generate professional proposals instantly. Click one button to compile and text or email a polished quote before your competitors leave the job site.</p></div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("### 📥 Instant PDF Delivery")
+            st.write("Generate professional proposals instantly. Click one button to compile and text or email a polished quote before your competitors leave the job site.")
         
     st.markdown("---")
     
@@ -183,7 +133,7 @@ elif page_selection == "🏗️ AI Estimate Engine":
                         messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
                         response_format=AIQuoteResponse,
                     )
-                    st.session_state['data'] = completion.choices[0].message.parsed
+                    st.session_state['data'] = completion.choices.message.parsed
                     st.session_state['p_type'] = project_type
                     st.session_state['dims'] = dimensions
                     st.session_state['zip_c'] = zip_code
@@ -197,4 +147,62 @@ elif page_selection == "🏗️ AI Estimate Engine":
         data = st.session_state['data']
         st.success("🎉 Estimate Complete!")
         
-        # Floating styled output metrics dashboard
+        with st.container(border=True):
+            st.subheader(f"💰 Grand Total: ${data.grand_total:.2f}")
+        st.write("")
+        
+        pdf_file = generate_pdf(data, st.session_state['p_type'], st.session_state['dims'], st.session_state['zip_c'])
+        st.download_button(label="📥 Download Estimate Profile as PDF", data=pdf_file, file_name=f"Estimate_{st.session_state['p_type'].replace(' ', '_')}.pdf", mime="application/pdf")
+        
+        st.write(f"**Justification:** {data.business_justification}")
+        st.write(f"**Days to Complete:** {data.estimated_days_to_complete} business days")
+        
+        st.markdown("### 🪵 Materials Itemization")
+        for item in data.materials_list:
+            st.write(f"• **{item.item_name}**: {item.quantity} {item.unit} @ ${item.estimated_cost_per_unit:.2f}/unit = **${item.total_item_cost:.2f}**")
+            
+        st.markdown("### 🛠️ Regional Labor Costs")
+        for labor in data.labor_list:
+            st.write(f"• **{labor.item_name}**: {labor.quantity} {labor.unit} @ ${labor.estimated_cost_per_unit:.2f}/unit = **${labor.total_item_cost:.2f}**")
+
+# =========================================================
+# MONITOR 3: SUBSCRIPTION BILLING HUD
+# =========================================================
+elif page_selection == "💳 Premium Licensing":
+    st.title("💳 Secure Your Active Enterprise License")
+    st.write("Unlock the absolute driveway sales weapon for your field operations crew.")
+    st.markdown("---")
+    
+    tier1, tier2, tier3 = st.columns(3)
+    
+    with tier1:
+        with st.container(border=True):
+            st.markdown("### 🆕 Free Test Tier")
+            st.markdown("## **$0.00 / mo**")
+            st.write("• 5 Total Free Estimates")
+            st.write("• Basic On-Screen Calculator")
+            st.write("❌ No PDF Document Downloads")
+            st.write("❌ No AI Client Lead Generator Bot")
+            st.write("")
+            st.button("Active Free Account", disabled=True, key="free_btn")
+        
+    with tier2:
+        with st.container(border=True):
+            st.markdown("### 🛠️ Standard License")
+            st.markdown("## **$30.00 / mo**")
+            st.write("• 25 Automated Estimates / Mo")
+            st.write("• Uncapped Custom PDF Downloads")
+            st.write("• Multi-Device Phone Access")
+            st.write("❌ No AI Client Lead Generator Bot")
+            st.write("")
+            st.markdown("[🔥 Activate Standard Link](https://stripe.com)")
+        
+    with tier3:
+        with st.container(border=True):
+            st.markdown("### 👑 Unlimited Premium")
+            st.markdown("## **$99.00 / mo**")
+            st.write("• **Unlimited Estimates Forever**")
+            st.write("• Uncapped Custom PDF Downloads")
+            st.write("• Full AI Customer Support Lead Bot")
+            st.write("• Lifetime Data Proof Storage Records")
+            st.write("")
