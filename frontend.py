@@ -83,8 +83,8 @@ def generate_pdf(data: AIQuoteResponse, p_type: str, dims: str, zip_c: str):
     for item in data.materials_list:
         mat_data.append([item.item_name, str(item.quantity), item.unit, f"${item.estimated_cost_per_unit:.2f}", f"${item.total_item_cost:.2f}"])
     
-    # BRACKETS LEAKS FULLY PATCHED HERE BY AUTO-CALCULATING DYNAMIC COLUMN WIDTHS
-    t_mat = Table(mat_data, colWidths=[180, 50, 50, 80, 90])
+    # FIXED COLUMN WIDTH VALS PLUGGED IN HERE
+    t_mat = Table(mat_data, colWidths=[250, 50, 50, 70, 80])
     t_mat.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1E1E1E')),
         ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
@@ -99,8 +99,8 @@ def generate_pdf(data: AIQuoteResponse, p_type: str, dims: str, zip_c: str):
     for labor in data.labor_list:
         lab_data.append([labor.item_name, str(labor.quantity), labor.unit, f"${labor.estimated_cost_per_unit:.2f}", f"${labor.total_item_cost:.2f}"])
     
-    # BRACKETS LEAKS FULLY PATCHED HERE BY AUTO-CALCULATING DYNAMIC COLUMN WIDTHS
-    t_lab = Table(lab_data, colWidths=[180, 50, 50, 80, 90])
+    # FIXED COLUMN WIDTH VALS PLUGGED IN HERE
+    t_lab = Table(lab_data, colWidths=[250, 50, 50, 70, 80])
     t_lab.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0A192F')),
         ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
@@ -193,3 +193,4 @@ elif page_selection == "🏗️ AI Estimate Engine":
                     system_prompt = "You are an expert construction estimator. Output accurate, professional itemized cost estimates."
                     user_prompt = f"Type: {project_type}\nMaterials: {materials_requested}\nScope: {dimensions}\nZip: {zip_code}\nNotes: {extra_notes}"
                     completion = client.beta.chat.completions.parse(
+                        model="gpt-4o-mini",
