@@ -83,8 +83,8 @@ def generate_pdf(data: AIQuoteResponse, p_type: str, dims: str, zip_c: str):
     for item in data.materials_list:
         mat_data.append([item.item_name, str(item.quantity), item.unit, f"${item.estimated_cost_per_unit:.2f}", f"${item.total_item_cost:.2f}"])
     
-    # BRACKET CEILING FULLY PATCHED HERE WITH COLUMN PARAMETERS
-    t_mat = Table(mat_data, colWidths=[200, 60, 60, 80, 80])
+    # FIXED COLUMN WIDTH VALS PLUGGED IN EXPLICITLY HERE
+    t_mat = Table(mat_data, colWidths=[180, 60, 60, 80, 100])
     t_mat.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1E1E1E')),
         ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
@@ -99,8 +99,8 @@ def generate_pdf(data: AIQuoteResponse, p_type: str, dims: str, zip_c: str):
     for labor in data.labor_list:
         lab_data.append([labor.item_name, str(labor.quantity), labor.unit, f"${labor.estimated_cost_per_unit:.2f}", f"${labor.total_item_cost:.2f}"])
     
-    # BRACKET CEILING FULLY PATCHED HERE WITH COLUMN PARAMETERS
-    t_lab = Table(lab_data, colWidths=[200, 60, 60, 80, 80])
+    # FIXED COLUMN WIDTH VALS PLUGGED IN EXPLICITLY HERE
+    t_lab = Table(lab_data, colWidths=[180, 60, 60, 80, 100])
     t_lab.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0A192F')),
         ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
