@@ -1,0 +1,58 @@
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+
+def generate_pdf(data, p_type: str, dims: str, zip_c: str):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40)
+    story = []
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('DocTitle', parent=styles['Heading1'], fontSize=24, leading=28, textColor=colors.HexColor('#1E1E1E'), spaceAfter=15)
+    section_style = ParagraphStyle('SectionHeading', parent=styles['Heading2'], fontSize=14, leading=18, textColor=colors.HexColor('#0A192F'), spaceBefore=12, spaceAfter=6)
+    body_style = ParagraphStyle('BodyTextCustom', parent=styles['Normal'], fontSize=10, leading=14, spaceAfter=8)
+    
+    story.append(Paragraph("🏗️ QUICK QUOTE AI - COST ESTIMATE", title_style))
+    story.append(Paragraph(f"<b>Project Type:</b> {p_type} | <b>Scope:</b> {dims} | <b>Location Zip:</b> {zip_c}", body_style))
+    story.append(Spacer(1, 15))
+    story.append(Paragraph("Executive Pricing Justification", section_style))
+    story.append(Paragraph(data.business_justification, body_style))
+    story.append(Paragraph(f"<b>Estimated Days to Complete:</b> {data.estimated_days_to_complete} business days", body_style))
+    story.append(Spacer(1, 15))
+    
+    story.append(Paragraph("🪵 Itemized Materials Breakdown", section_style))
+    mat_data = [["Material / Item", "Qty", "Unit", "Cost/Unit", "Total"]]
+    for item in data.materials_list:
+        mat_data.append([item.item_name, str(item.quantity), item.unit, f"${item.estimated_cost_per_unit:.2f}", f"${item.total_item_cost:.2f}"])
+    
+    t_mat = Table(mat_data, colWidths=[200, 50, 50, 80, 80])
+    t_mat.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1E1E1E')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.lightgrey),
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor('#F9F9F9')])
+    ]))
+    story.append(t_mat)
+    story.append(Spacer(1, 15))
+    
+    story.append(Paragraph("🛠️ Regional Labor Breakdown", section_style))
+    lab_data = [["Labor Description", "Qty", "Unit", "Rate/Unit", "Total"]]
+    for labor in data.labor_list:
+        lab_data.append([labor.item_name, str(labor.quantity), labor.unit, f"${labor.estimated_cost_per_unit:.2f}", f"${labor.total_item_cost:.2f}"])
+    
+    t_lab = Table(lab_data, colWidths=[200, 50, 50, 80, 80])
+    t_lab.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0A192F')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.lightgrey),
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor('#F9F9F9')])
+    ]))
+    story.append(t_lab)
+    story.append(Spacer(1, 20))
+    
+    grand_total_style = ParagraphStyle('GrandTotal', parent=styles['Heading2'], fontSize=16, leading=20, textColor=colors.HexColor('#D9534F'), alignment=2)
+    story.append(Paragraph(f"GRAND TOTAL ESTIMATE: ${data.grand_total:.2f}", grand_total_style))
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
