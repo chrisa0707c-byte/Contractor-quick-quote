@@ -3,46 +3,89 @@ import os
 from openai import OpenAI
 from pydantic import BaseModel
 from typing import List
-from pdf_builder import generate_pdf # Bypasses syntax issues completely by importing externally
+from pdf_builder import generate_pdf
 
-# --- ENTERPRISE INTERFACE SYSTEM CONFIGURATION ---
+# --- THE NATIVE PREMIUM AESTHETIC THEME ENGINE ---
 st.set_page_config(
-    page_title="Quick Quote AI - Enterprise", 
+    page_title="Quick Quote AI - Premium Console", 
     page_icon="🏗️", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Premium dark theme styling injection
+# Raw CSS injection to create an elite, modernist software dashboard design
 st.markdown("""
     <style>
-        .reportview-container { background: #0A192F; color: #F4F6F9; }
-        .sidebar .sidebar-content { background: #020C1B; }
-        div.stButton > button:first-child {
-            background-color: #FF6B35; color: white; border-radius: 6px;
-            border: none; font-weight: bold; width: 100%; height: 3em;
+        /* Modernist Radial Background Matrix */
+        .stApp {
+            background: radial-gradient(circle, #0A192F 0%, #020C1B 100%) !important;
+            color: #F4F6F9 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        div.stButton > button:first-child:hover { background-color: #FF8552; }
+        
+        /* Sidebar Polish */
+        section[data-testid="stSidebar"] {
+            background-color: #020C1B !important;
+            border-right: 1px solid #1E293B;
+        }
+        
+        /* Floating Glassmorphic Container Cards */
+        div[data-testid="stForm"], .stAlert, div.element-container div.stMarkdown div {
+            background: rgba(13, 27, 42, 0.65) !important;
+            border: 1px solid #FF6B35 !important;
+            border-radius: 12px !important;
+            padding: 25px !important;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+        }
+        
+        /* Neon Button Styling Rules */
+        div.stButton > button:first-child {
+            background: linear-gradient(135deg, #FF6B35 0%, #D9534F 100%) !important;
+            color: white !important;
+            border-radius: 8px !important;
+            border: none !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4) !important;
+        }
+        div.stButton > button:first-child:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6) !important;
+        }
+        
+        /* Polished Form Inputs */
+        input, select, textarea {
+            background-color: #020C1B !important;
+            color: white !important;
+            border: 1px solid #1E293B !important;
+            border-radius: 6px !important;
+        }
+        input:focus {
+            border-color: #FF6B35 !important;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.5) !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# --- FREEMIUM USE COUNTER MANAGER ---
+# --- INITIALIZE TRIAL VALUE HUD COUNTER ---
 if 'quotes_used' not in st.session_state:
     st.session_state['quotes_used'] = 0
 
 FREE_LIMIT = 5
 remaining_quotes = FREE_LIMIT - st.session_state['quotes_used']
 
-# --- HUDBAR SYSTEM PANEL ---
-st.sidebar.image("https://icons8.com", width=70)
+# --- SIDEBAR HUD DISPLAY ---
+st.sidebar.image("https://icons8.com", width=65)
 st.sidebar.title("Quick Quote AI")
-st.sidebar.markdown(f"**⚡ Account Status:** `Free Beta Tier`")
-st.sidebar.markdown(f"**📊 Estimates Remaining:** `{remaining_quotes} / {FREE_LIMIT}`")
+st.sidebar.markdown(f"**⚡ System Status:** <span style='color:#FF6B35;font-weight:bold;'>PRO BETA</span>", unsafe_allow_html=True)
+st.sidebar.markdown(f"**📊 Usage Allocation:** `{remaining_quotes} / {FREE_LIMIT} Remaining`")
 st.sidebar.markdown("---")
 
-page_selection = st.sidebar.radio("Enterprise Console", ["🏠 Company Overview", "🏗️ AI Estimate Engine", "💳 Premium Licensing"])
+page_selection = st.sidebar.radio("Navigate Enterprise Console", ["🏠 Platform Overview", "🏗️ AI Estimate Engine", "💳 Premium Licensing"])
 
-# --- DATA MODELLING STRUCTURES ---
+# --- DATA MODEL HOOKS ---
 class LineItem(BaseModel):
     item_name: str
     quantity: float
@@ -60,25 +103,27 @@ class AIQuoteResponse(BaseModel):
 # =========================================================
 # MONITOR 1: BRAND SALES LANDING SUMMARY
 # =========================================================
-if page_selection == "🏠 Company Overview":
-    st.title("🏗️ Stop Losing Construction Deals to Slow Estimates")
-    st.markdown("### Close residential clients directly from the driveway in under 30 seconds.")
+if page_selection == "🏠 Platform Overview":
+    st.markdown("<h1 style='text-align: center; color: white;'>🏗️ Stop Losing Construction Deals to Slow Estimates</h1>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: #FF6B35;'>Close residential clients directly from the driveway in under 30 seconds.</h3>", unsafe_allow_html=True)
+    st.markdown("<br><br>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.info("### ⚡ 30-Second Quotes\nDitch evening paperwork. Type parameters right at the job site and let regional AI models construct cost itemizations instantly.")
+        st.markdown("<div style='background:rgba(13,27,42,0.4);border-left:4px solid #FF6B35;padding:20px;border-radius:8px;'><h3>⚡ 30-Second Quotes</h3><p>Ditch evening paperwork. Type parameters right at the job site and let regional AI models construct cost itemizations instantly.</p></div>", unsafe_allow_html=True)
     with col2:
-        st.info("### 🧾 Zero Speculation\nBuild massive customer trust. Hand your client a transparent material and labor breakdown that removes price haggling completely.")
+        st.markdown("<div style='background:rgba(13,27,42,0.4);border-left:4px solid #FF6B35;padding:20px;border-radius:8px;'><h3>🧾 Zero Speculation</h3><p>Build massive customer trust. Hand your client a transparent material and labor breakdown that removes price haggling completely.</p></div>", unsafe_allow_html=True)
     with col3:
-        st.info("### 📥 Instant PDF Delivery\nGenerate professional proposals instantly. Click one button to compile and text or email a polished quote before your competitors leave the job site.")
+        st.markdown("<div style='background:rgba(13,27,42,0.4);border-left:4px solid #FF6B35;padding:20px;border-radius:8px;'><h3>📥 Instant PDF Delivery</h3><p>Generate professional proposals instantly. Click one button to compile and text or email a polished quote before your competitors leave the job site.</p></div>", unsafe_allow_html=True)
         
     st.markdown("---")
     
+    # THE CLIENT INQUIRY SUPPORT BOT PANEL
     st.subheader("🤖 Client Lead Generator Bot (Beta Preview)")
     st.write("Embed this bot directly on your website to catch project details while you sleep.")
     
     if "messages" not in st.session_state:
-        st.session_state.messages = [{"role": "assistant", "content": "Hello! I am your project assistant. Describe what work you need done, and I will capture the project scope."}]
+        st.session_state.messages = [{"role": "assistant", "content": "Hello! I am your automated project assistant. Describe what trade work you need done, and I will capture the project scope."}]
         
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
@@ -93,7 +138,7 @@ if page_selection == "🏠 Company Overview":
             client = OpenAI()
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
-                messages=[{"role": "system", "content": "You are a customer assistant for a top contracting firm. Guide them smoothly."}, *st.session_state.messages]
+                messages=[{"role": "system", "content": "You are a customer assistant for a top contracting firm. Guide them smoothly to capture scope data."}, *st.session_state.messages]
             )
             reply = response.choices.message.content
             st.session_state.messages.append({"role": "assistant", "content": reply})
@@ -107,6 +152,7 @@ if page_selection == "🏠 Company Overview":
 # =========================================================
 elif page_selection == "🏗️ AI Estimate Engine":
     st.title("🏗️ Quick Quote AI Estimation Console")
+    st.write("Input project parameters below to deploy instant material and labor data arrays.")
     
     if st.session_state['quotes_used'] >= FREE_LIMIT:
         st.error("🚨 Free Beta Limit Reached!")
@@ -150,58 +196,5 @@ elif page_selection == "🏗️ AI Estimate Engine":
     if 'data' in st.session_state:
         data = st.session_state['data']
         st.success("🎉 Estimate Complete!")
-        st.subheader(f"💰 Grand Total: ${data.grand_total:.2f}")
         
-        # Runs the external file engine link smoothly
-        pdf_file = generate_pdf(data, st.session_state['p_type'], st.session_state['dims'], st.session_state['zip_c'])
-        st.download_button(label="📥 Download Estimate Profile as PDF", data=pdf_file, file_name=f"Estimate_{st.session_state['p_type'].replace(' ', '_')}.pdf", mime="application/pdf")
-        
-        st.write(f"**Justification:** {data.business_justification}")
-        st.write(f"**Days to Complete:** {data.estimated_days_to_complete} business days")
-        
-        st.markdown("### 🪵 Materials Itemization")
-        for item in data.materials_list:
-            st.write(f"• **{item.item_name}**: {item.quantity} {item.unit} @ ${item.estimated_cost_per_unit:.2f}/unit = **${item.total_item_cost:.2f}**")
-            
-        st.markdown("### 🛠️ Regional Labor Costs")
-        for labor in data.labor_list:
-            st.write(f"• **{labor.item_name}**: {labor.quantity} {labor.unit} @ ${labor.estimated_cost_per_unit:.2f}/unit = **${labor.total_item_cost:.2f}**")
-
-# =========================================================
-# MONITOR 3: SUBSCRIPTION BILLING HUD
-# =========================================================
-elif page_selection == "💳 Premium Licensing":
-    st.title("💳 Secure Your Active Enterprise License")
-    st.write("Unlock the absolute driveway sales weapon for your field operations crew.")
-    st.markdown("---")
-    
-    tier1, tier2, tier3 = st.columns(3)
-    
-    with tier1:
-        st.markdown("### 🆕 Free Test Tier")
-        st.markdown("## **$0.00 / mo**")
-        st.write("• 5 Total Free Estimates")
-        st.write("• Basic On-Screen Calculator")
-        st.write("❌ No PDF Document Downloads")
-        st.write("❌ No AI Client Lead Generator Bot")
-        st.write("")
-        st.button("Active Free Account", disabled=True)
-        
-    with tier2:
-        st.markdown("### 🛠️ Standard License")
-        st.markdown("## **$30.00 / mo**")
-        st.write("• 25 Automated Estimates / Mo")
-        st.write("• Uncapped Custom PDF Downloads")
-        st.write("• Multi-Device Phone Access")
-        st.write("❌ No AI Client Lead Generator Bot")
-        st.write("")
-        st.markdown("[🔥 Activate Standard Link](https://stripe.com)")
-        
-    with tier3:
-        st.markdown("### 👑 Unlimited Premium")
-        st.markdown("## **$99.00 / mo**")
-        st.write("• **Unlimited Estimates Forever**")
-        st.write("• Uncapped Custom PDF Downloads")
-        st.write("• Full AI Customer Support Lead Bot")
-        st.write("• Lifetime Data Proof Storage Records")
-        st.write("")
+        # Floating styled output metrics dashboard
