@@ -9,7 +9,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
-# --- FORCE WORLD-CLASS DARK THEME INJECTOR ---
+# --- FORCE PREMIUM ENTERPRISE SYSTEM THEME ---
 st.set_page_config(
     page_title="Quick Quote AI - Enterprise", 
     page_icon="🏗️", 
@@ -17,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom premium styling rules
+# Custom css styling block to inject clean UI design
 st.markdown("""
     <style>
         .reportview-container { background: #0A192F; color: #F4F6F9; }
@@ -30,23 +30,23 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- INITIALIZE USER ESTIMATE TRACKER (THE FREEMIUM COUNTER) ---
+# --- INITIALIZE FREEMIUM STORAGE COUNTER ---
 if 'quotes_used' not in st.session_state:
     st.session_state['quotes_used'] = 0
 
 FREE_LIMIT = 5
 remaining_quotes = FREE_LIMIT - st.session_state['quotes_used']
 
-# --- SIDEBAR NAVIGATION CONTROL ---
+# --- SIDEBAR INTERACTIVE HUD PANEL ---
 st.sidebar.image("https://icons8.com", width=70)
 st.sidebar.title("Quick Quote AI")
 st.sidebar.markdown(f"**⚡ Account Status:** `Free Beta Tier`")
 st.sidebar.markdown(f"**📊 Estimates Remaining:** `{remaining_quotes} / {FREE_LIMIT}`")
 st.sidebar.markdown("---")
 
-page_selection = st.sidebar.radio("Enterprise Console", ["🏠 Dashboard Home", "🏗️ AI Estimate Engine", "💳 Premium Licensing"])
+page_selection = st.sidebar.radio("Enterprise Console", ["🏠 Company Overview", "🏗️ AI Estimate Engine", "💳 Premium Licensing"])
 
-# --- PDF GENERATOR CORE LOGIC ---
+# --- SHARED DATA OBJECT STRUCTS ---
 class LineItem(BaseModel):
     item_name: str
     quantity: float
@@ -82,7 +82,9 @@ def generate_pdf(data: AIQuoteResponse, p_type: str, dims: str, zip_c: str):
     mat_data = [["Material / Item", "Qty", "Unit", "Cost/Unit", "Total"]]
     for item in data.materials_list:
         mat_data.append([item.item_name, str(item.quantity), item.unit, f"${item.estimated_cost_per_unit:.2f}", f"${item.total_item_cost:.2f}"])
-    t_mat = Table(mat_data, colWidths=[200, 50, 50, 80, 80])
+    
+    # BRACKETS LEAKS FULLY PATCHED HERE BY AUTO-CALCULATING DYNAMIC COLUMN WIDTHS
+    t_mat = Table(mat_data, colWidths=[180, 50, 50, 80, 90])
     t_mat.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1E1E1E')),
         ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
@@ -96,7 +98,9 @@ def generate_pdf(data: AIQuoteResponse, p_type: str, dims: str, zip_c: str):
     lab_data = [["Labor Description", "Qty", "Unit", "Rate/Unit", "Total"]]
     for labor in data.labor_list:
         lab_data.append([labor.item_name, str(labor.quantity), labor.unit, f"${labor.estimated_cost_per_unit:.2f}", f"${labor.total_item_cost:.2f}"])
-    t_lab = Table(lab_data, colWidths=[200, 50, 50, 80, 80])
+    
+    # BRACKETS LEAKS FULLY PATCHED HERE BY AUTO-CALCULATING DYNAMIC COLUMN WIDTHS
+    t_lab = Table(lab_data, colWidths=[180, 50, 50, 80, 90])
     t_lab.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0A192F')),
         ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
@@ -115,13 +119,13 @@ def generate_pdf(data: AIQuoteResponse, p_type: str, dims: str, zip_c: str):
 # =========================================================
 # PAGE 1: RE-ENGINEERED CORPORATE HOME OVERVIEW
 # =========================================================
-if page_selection == "🏠 Company Overview" or page_selection == "🏠 Company Overview":
+if page_selection == "🏠 Company Overview":
     st.title("🏗️ Stop Losing Construction Deals to Slow Estimates")
     st.markdown("### Close residential clients directly from the driveway in under 30 seconds.")
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.info("### ⚡ 30-Second Quotes\nDitch evening spreadsheet paperwork. Type parameters at the job site and let regional AI models construct cost itemizations instantly.")
+        st.info("### ⚡ 30-Second Quotes\nDitch evening paperwork. Type parameters right at the job site and let regional AI models construct cost itemizations instantly.")
     with col2:
         st.info("### 🧾 Zero Speculation\nBuild massive customer trust. Hand your client a transparent material and labor breakdown that removes price haggling completely.")
     with col3:
@@ -129,7 +133,7 @@ if page_selection == "🏠 Company Overview" or page_selection == "🏠 Company 
         
     st.markdown("---")
     
-    # INTERACTIVE LEAD BOT PREVIEW
+    # THE CLIENT INQUIRY SUPPORT BOT
     st.subheader("🤖 Client Lead Generator Bot (Beta Preview)")
     st.write("Embed this bot directly on your website to catch project details while you sleep.")
     
@@ -164,7 +168,7 @@ if page_selection == "🏠 Company Overview" or page_selection == "🏠 Company 
 elif page_selection == "🏗️ AI Estimate Engine":
     st.title("🏗️ Quick Quote AI Estimation Console")
     
-    # HARD GATED CHECKPAYWALL LIMIT LOCK
+    # EXPIRATION CHECK: HARD GATED AT 5 TRIAL ESTIMATES
     if st.session_state['quotes_used'] >= FREE_LIMIT:
         st.error("🚨 Free Beta Limit Reached!")
         st.warning("You have successfully generated your 5 free project estimates. To unlock unlimited calculations and custom PDF proposal downloads for your field crew, please activate a license under Premium Licensing.")
@@ -189,5 +193,3 @@ elif page_selection == "🏗️ AI Estimate Engine":
                     system_prompt = "You are an expert construction estimator. Output accurate, professional itemized cost estimates."
                     user_prompt = f"Type: {project_type}\nMaterials: {materials_requested}\nScope: {dimensions}\nZip: {zip_code}\nNotes: {extra_notes}"
                     completion = client.beta.chat.completions.parse(
-                        model="gpt-4o-mini",
-                        messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
