@@ -206,3 +206,20 @@ elif page_selection == "💳 Premium Licensing":
             st.write("• Full AI Customer Support Lead Bot")
             st.write("• Lifetime Data Proof Storage Records")
             st.write("")
+# --- THE PASSIVE FOUNDER FEEDBACK ENGINE (RE-ADDED) ---
+st.markdown("---")
+st.subheader("💡 Founder Beta Feedback")
+st.write("Help me build the ultimate driveway tool for your business. Tell me what features you want next!")
+
+with st.form("feedback_form", clear_on_submit=True):
+    contractor_name = st.text_input("Your Name / Company Name")
+    feedback_text = st.text_area("What updates or features do you need? (e.g., custom logo uploader, past quote ledger, text alerts)")
+    submit_feedback = st.form_submit_button("Submit Anonymous Note to Founder")
+
+if submit_feedback:
+    if not feedback_text:
+        st.warning("Please enter your message before submitting.")
+    else:
+        with open("user_feedback.txt", "a") as f:
+            f.write(f"Company: {contractor_name} | Feedback: {feedback_text}\n")
+        st.success("🔥 Feedback submitted directly to the founder! Thank you.")
