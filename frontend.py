@@ -206,10 +206,15 @@ elif page_selection == "💳 Premium Licensing":
             st.write("• Full AI Customer Support Lead Bot")
             st.write("• Lifetime Data Proof Storage Records")
             st.write("")
-# --- THE PASSIVE FOUNDER FEEDBACK ENGINE (RE-ADDED) ---
+# =========================================================
+# THE LIVE WEB-ROUTED FEEDBACK ENGINE (RE-ADDED & FIXED)
+# =========================================================
 st.markdown("---")
 st.subheader("💡 Founder Beta Feedback")
 st.write("Help me build the ultimate driveway tool for your business. Tell me what features you want next!")
+
+# Explicitly import the requests library inside this module block
+import requests
 
 with st.form("feedback_form", clear_on_submit=True):
     contractor_name = st.text_input("Your Name / Company Name")
@@ -220,6 +225,20 @@ if submit_feedback:
     if not feedback_text:
         st.warning("Please enter your message before submitting.")
     else:
-        with open("user_feedback.txt", "a") as f:
-            f.write(f"Company: {contractor_name} | Feedback: {feedback_text}\n")
-        st.success("🔥 Feedback submitted directly to the founder! Thank you.")
+        # 🔗 PLACE YOUR COPIED FORMSPREE LINK EXACTLY INSIDE THESE QUOTES:
+        FORMSPREE_URL = "https://formspree.io/f/xppzbyol"
+        
+        payload = {
+            "Company": contractor_name,
+            "Feedback": feedback_text
+        }
+        
+        try:
+            response = requests.post(FORMSPREE_URL, json=payload)
+            if response.status_code == 200:
+                st.success("🎉 Feedback submitted directly to the founder's email! Thank you.")
+            else:
+                st.error("Submission error. Please verify your Formspree Key or try again.")
+        except Exception as e:
+            st.error("Network connection offline. Please try again.")
+
