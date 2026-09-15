@@ -195,7 +195,9 @@ elif page_selection == "💳 Premium Licensing":
             st.write("• Multi-Device Phone Access")
             st.write("❌ No AI Client Lead Generator Bot")
             st.write("")
-            st.markdown("[https://buy.stripe.com/9B66oGdKreMF7cGfrT8IU01](https://stripe.com)")
+                        # Native high-end checkout link routing button
+            st.link_button("🚀 Activate Standard Plan", "https://buy.stripe.com/aFadR8eOvfQJ9kO6Vn8IU00", use_container_width=True)
+
         
     with tier3:
         with st.container(border=True):
@@ -205,7 +207,9 @@ elif page_selection == "💳 Premium Licensing":
             st.write("• Uncapped Custom PDF Downloads")
             st.write("• Full AI Customer Support Lead Bot")
             st.write("• Lifetime Data Proof Storage Records")
-            st.markdown("[https://buy.stripe.com/9B66oGdKreMF7cGfrT8IU01](https://stripe.com)")
+                        # Native high-end checkout link routing button
+            st.link_button("👑 Go Unlimited Premium", "https://buy.stripe.com/9B66oGdKreMF7cGfrT8IU01", use_container_width=True)
+
 
 
 
