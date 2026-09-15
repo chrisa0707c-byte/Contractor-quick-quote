@@ -195,7 +195,7 @@ elif page_selection == "💳 Premium Licensing":
             st.write("• Multi-Device Phone Access")
             st.write("❌ No AI Client Lead Generator Bot")
             st.write("")
-            st.markdown("[🔥 Activate Standard Link](https://stripe.com)")
+            st.markdown("[https://buy.stripe.com/9B66oGdKreMF7cGfrT8IU01](https://stripe.com)")
         
     with tier3:
         with st.container(border=True):
@@ -205,7 +205,11 @@ elif page_selection == "💳 Premium Licensing":
             st.write("• Uncapped Custom PDF Downloads")
             st.write("• Full AI Customer Support Lead Bot")
             st.write("• Lifetime Data Proof Storage Records")
-            st.write("")
+            st.markdown("[https://buy.stripe.com/9B66oGdKreMF7cGfrT8IU01](https://stripe.com)")
+
+
+
+
 # =========================================================
 # THE LIVE WEB-ROUTED FEEDBACK ENGINE (RE-ADDED & FIXED)
 # =========================================================
