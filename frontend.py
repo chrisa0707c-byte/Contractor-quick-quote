@@ -90,7 +90,8 @@ if page_selection == "🏠 Platform Overview":
                 model="gpt-4o-mini",
                 messages=[{"role": "system", "content": "You are a customer assistant for a top contracting firm. Guide them smoothly to capture scope data."}, *st.session_state.messages]
             )
-            reply = response.choices.message.content
+            # ⚡ OPENAI BACKEND PARSING ERROR FIXED RIGHT HERE ⚡
+            reply = response.choices[0].message.content
             st.session_state.messages.append({"role": "assistant", "content": reply})
             with st.chat_message("assistant"):
                 st.write(reply)
@@ -133,7 +134,7 @@ elif page_selection == "🏗️ AI Estimate Engine":
                         messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
                         response_format=AIQuoteResponse,
                     )
-                    st.session_state['data'] = completion.choices.message.parsed
+                    st.session_state['data'] = completion.choices[0].message.parsed
                     st.session_state['p_type'] = project_type
                     st.session_state['dims'] = dimensions
                     st.session_state['zip_c'] = zip_code
@@ -195,9 +196,8 @@ elif page_selection == "💳 Premium Licensing":
             st.write("• Multi-Device Phone Access")
             st.write("❌ No AI Client Lead Generator Bot")
             st.write("")
-                        # Native high-end checkout link routing button
-            st.link_button("🚀 Activate Standard Plan", "https://buy.stripe.com/aFadR8eOvfQJ9kO6Vn8IU00", use_container_width=True)
-
+            # Native high-end checkout link routing button
+            st.link_button("🚀 Activate Standard Plan", "https://stripe.com", use_container_width=True)
         
     with tier3:
         with st.container(border=True):
@@ -205,48 +205,3 @@ elif page_selection == "💳 Premium Licensing":
             st.markdown("## **$99.00 / mo**")
             st.write("• **Unlimited Estimates Forever**")
             st.write("• Uncapped Custom PDF Downloads")
-            st.write("• Full AI Customer Support Lead Bot")
-            st.write("• Lifetime Data Proof Storage Records")
-                        # Native high-end checkout link routing button
-            st.link_button("👑 Go Unlimited Premium", "https://buy.stripe.com/9B66oGdKreMF7cGfrT8IU01", use_container_width=True)
-
-
-
-
-
-# =========================================================
-# THE LIVE WEB-ROUTED FEEDBACK ENGINE (RE-ADDED & FIXED)
-# =========================================================
-st.markdown("---")
-st.subheader("💡 Founder Beta Feedback")
-st.write("Help me build the ultimate driveway tool for your business. Tell me what features you want next!")
-
-# Explicitly import the requests library inside this module block
-import requests
-
-with st.form("feedback_form", clear_on_submit=True):
-    contractor_name = st.text_input("Your Name / Company Name")
-    feedback_text = st.text_area("What updates or features do you need? (e.g., custom logo uploader, past quote ledger, text alerts)")
-    submit_feedback = st.form_submit_button("Submit Anonymous Note to Founder")
-
-if submit_feedback:
-    if not feedback_text:
-        st.warning("Please enter your message before submitting.")
-    else:
-        # 🔗 PLACE YOUR COPIED FORMSPREE LINK EXACTLY INSIDE THESE QUOTES:
-        FORMSPREE_URL = "https://formspree.io/f/xppzbyol"
-        
-        payload = {
-            "Company": contractor_name,
-            "Feedback": feedback_text
-        }
-        
-        try:
-            response = requests.post(FORMSPREE_URL, json=payload)
-            if response.status_code == 200:
-                st.success("🎉 Feedback submitted directly to the founder's email! Thank you.")
-            else:
-                st.error("Submission error. Please verify your Formspree Key or try again.")
-        except Exception as e:
-            st.error("Network connection offline. Please try again.")
-
