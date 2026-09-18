@@ -189,6 +189,3 @@ elif page_selection == "🏗️ AI Estimate Engine":
             
         st.markdown("### 🛠️ Regional Labor Costs")
         for labor in data.labor_list:
-                    for labor in data.labor_list:
-            st.write(f"• {labor.item_name} - ${labor.total_item_cost:.2f}")
-
