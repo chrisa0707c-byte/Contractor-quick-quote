@@ -27,7 +27,7 @@ st.sidebar.markdown(f"**⚡ System Status:** `PRO BETA`")
 st.sidebar.markdown(f"**📊 Usage Allocation:** `{remaining_quotes} / {FREE_LIMIT} Remaining`")
 st.sidebar.markdown("---")
 
-# 🧰 The New Onboarding Trade Profiler Matrix Injection
+# 🧰 The Onboarding Trade Profiler Matrix Injection
 user_trade = st.sidebar.selectbox(
     "Select Your Field Trade Profile:",
     ["🏗️ General Contractor", "🏠 Roofer / Siding Tech", "🪠 Professional Plumber", "⚡ Master Electrician", "🪵 Carpenter / Deck Builder"]
@@ -98,7 +98,6 @@ if page_selection == "🏠 Platform Overview":
                 model="gpt-4o-mini",
                 messages=[{"role": "system", "content": "You are a customer assistant for a top contracting firm. Guide them smoothly to capture scope data."}, *st.session_state.messages]
             )
-            # ⚡ OPENAI BACKEND PARSING ERROR FIXED RIGHT HERE ⚡
             reply = response.choices[0].message.content
             st.session_state.messages.append({"role": "assistant", "content": reply})
             with st.chat_message("assistant"):
