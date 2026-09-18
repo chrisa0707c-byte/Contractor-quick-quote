@@ -20,11 +20,19 @@ if 'quotes_used' not in st.session_state:
 FREE_LIMIT = 5
 remaining_quotes = FREE_LIMIT - st.session_state['quotes_used']
 
-# --- SIDEBAR HUD DISPLAY ---
+# --- SIDEBAR HUD DISPLAY WITH MULTI-TRADE PROFILE SELECTOR ---
 st.sidebar.image("https://icons8.com", width=65)
 st.sidebar.title("Quick Quote AI")
 st.sidebar.markdown(f"**⚡ System Status:** `PRO BETA`")
 st.sidebar.markdown(f"**📊 Usage Allocation:** `{remaining_quotes} / {FREE_LIMIT} Remaining`")
+st.sidebar.markdown("---")
+
+# 🧰 The New Onboarding Trade Profiler Matrix Injection
+user_trade = st.sidebar.selectbox(
+    "Select Your Field Trade Profile:",
+    ["🏗️ General Contractor", "🏠 Roofer / Siding Tech", "🪠 Professional Plumber", "⚡ Master Electrician", "🪵 Carpenter / Deck Builder"]
+)
+st.sidebar.success(f"Workspace optimized for: **{user_trade}**")
 st.sidebar.markdown("---")
 
 page_selection = st.sidebar.radio("Navigate Enterprise Console", ["🏠 Platform Overview", "🏗️ AI Estimate Engine", "💳 Premium Licensing"])
@@ -99,23 +107,41 @@ if page_selection == "🏠 Platform Overview":
             st.error(f"Bot Offline: {str(e)}")
 
 # =========================================================
-# MONITOR 2: GATED ESTIMATION WORKSPACE
+# MONITOR 2: GATED DYNAMIC ESTIMATION WORKSPACE
 # =========================================================
 elif page_selection == "🏗️ AI Estimate Engine":
     st.title("🏗️ Quick Quote AI Estimation Console")
-    st.write("Input project parameters below to deploy instant material and labor data arrays.")
+    st.write(f"Input your raw parameters below. Your console has been dynamically tailored to: **{user_trade}**.")
     
     if st.session_state['quotes_used'] >= FREE_LIMIT:
         st.error("🚨 Free Beta Limit Reached!")
         st.warning("You have successfully generated your 5 free project estimates. To unlock unlimited calculations and custom PDF proposal downloads for your field crew, please activate a license under Premium Licensing.")
     else:
+        # ⚡ DYNAMIC INPUT FORM HINTS LOGIC BASED ON SIDEBAR TRADE SELECTION ⚡
         with st.form("quote_form"):
-            project_type = st.selectbox("Project Type", ["Roofing", "Painting", "Plumbing", "Drywall", "Flooring", "Deck Construction", "General Handyman"])
-            dimensions = st.text_input("Project Size / Scope (e.g., 500 sq ft)")
-            materials_requested = st.text_input("Materials Preferred (e.g., Premium Cedar Wood)")
-            zip_code = st.text_input("Job Zip Code")
-            extra_notes = st.text_input("Extra Notes (Optional)")
-            submit = st.form_submit_button("Generate Professional Estimate")
+            st.markdown(f"### 📋 Project Configuration Form — {user_trade}")
+            
+            if "Roofer" in user_trade:
+                dim_hint = "Project Size / Scope (e.g., 25 Squares, 2500 sq ft, 8/12 Pitch Angle)"
+                mat_hint = "Required Materials & Specifications (e.g., Timberline HDZ Shingles, Synthetic Underlayment, Ice & Water Shield)"
+            elif "Plumber" in user_trade:
+                dim_hint = "Project Size / Scope (e.g., 3-Bathroom Rough-In, 40 Linear Feet of Trenching)"
+                mat_hint = "Required Materials & Specifications (e.g., Schedule 40 PVC, Copper PEX Piping, Fixture counts and brands)"
+            elif "Electrician" in user_trade:
+                dim_hint = "Project Size / Scope (e.g., 200 Amp Service Upgrade, 2500 sq ft House Rewire)"
+                mat_hint = "Required Materials & Specifications (e.g., Romex 14/2 Wire, Siemens Panel Board, Outlet/Switch counts)"
+            elif "Carpenter" in user_trade:
+                dim_hint = "Project Size / Scope (e.g., 16x20 Floating Deck, 80 Linear Feet of Privacy Fencing)"
+                mat_hint = "Required Materials & Specifications (e.g., Pressure Treated Premium Lumber, Composite Decking boards)"
+            else:
+                dim_hint = "Project Size / Scope (e.g., 500 sq ft Driveway, 1200 sq ft Full Basement Renovation)"
+                mat_hint = "Required Materials & Specifications (Paste your raw text layout parameters, labor tasks, or material counts here)"
+
+            dimensions = st.text_input(dim_hint)
+            materials_requested = st.text_area(mat_hint, height=120)
+            zip_code = st.text_input("Job Zip Code / Region")
+            extra_notes = st.text_input("Extra Client Demands or Site Access Notes (Optional)")
+            submit = st.form_submit_button("Generate Professional Estimate Array")
 
         if submit:
             if not dimensions or not zip_code:
@@ -126,8 +152,8 @@ elif page_selection == "🏗️ AI Estimate Engine":
                 st.write("🔄 Calculating regional rates and compiling cost table...")
                 try:
                     client = OpenAI()
-                    system_prompt = "You are an expert construction estimator. Output accurate, professional itemized cost estimates."
-                    user_prompt = f"Type: {project_type}\nMaterials: {materials_requested}\nScope: {dimensions}\nZip: {zip_code}\nNotes: {extra_notes}"
+                    system_prompt = f"You are an expert construction estimator specialized exclusively in the field of: {user_trade}. Output highly accurate, professional itemized cost estimates matching this trade's exact current market metrics."
+                    user_prompt = f"Trade Context: {user_trade}\nMaterials/Specs: {materials_requested}\nScope/Dimensions: {dimensions}\nZip: {zip_code}\nNotes: {extra_notes}"
                     
                     completion = client.beta.chat.completions.parse(
                         model="gpt-4o-mini",
@@ -135,7 +161,7 @@ elif page_selection == "🏗️ AI Estimate Engine":
                         response_format=AIQuoteResponse,
                     )
                     st.session_state['data'] = completion.choices[0].message.parsed
-                    st.session_state['p_type'] = project_type
+                    st.session_state['p_type'] = user_trade
                     st.session_state['dims'] = dimensions
                     st.session_state['zip_c'] = zip_code
                     
@@ -164,44 +190,3 @@ elif page_selection == "🏗️ AI Estimate Engine":
             
         st.markdown("### 🛠️ Regional Labor Costs")
         for labor in data.labor_list:
-            st.write(f"• **{labor.item_name}**: {labor.quantity} {labor.unit} @ ${labor.estimated_cost_per_unit:.2f}/unit = **${labor.total_item_cost:.2f}**")
-
-# =========================================================
-# MONITOR 3: SUBSCRIPTION BILLING HUD
-# =========================================================
-elif page_selection == "💳 Premium Licensing":
-    st.title("💳 Secure Your Active Enterprise License")
-    st.write("Unlock the absolute driveway sales weapon for your field operations crew.")
-    st.markdown("---")
-    
-    tier1, tier2, tier3 = st.columns(3)
-    
-    with tier1:
-        with st.container(border=True):
-            st.markdown("### 🆕 Free Test Tier")
-            st.markdown("## **$0.00 / mo**")
-            st.write("• 5 Total Free Estimates")
-            st.write("• Basic On-Screen Calculator")
-            st.write("❌ No PDF Document Downloads")
-            st.write("❌ No AI Client Lead Generator Bot")
-            st.write("")
-            st.button("Active Free Account", disabled=True, key="free_btn")
-        
-    with tier2:
-        with st.container(border=True):
-            st.markdown("### 🛠️ Standard License")
-            st.markdown("## **$30.00 / mo**")
-            st.write("• 25 Automated Estimates / Mo")
-            st.write("• Uncapped Custom PDF Downloads")
-            st.write("• Multi-Device Phone Access")
-            st.write("❌ No AI Client Lead Generator Bot")
-            st.write("")
-            # Native high-end checkout link routing button
-            st.link_button("🚀 Activate Standard Plan", "https://stripe.com", use_container_width=True)
-        
-    with tier3:
-        with st.container(border=True):
-            st.markdown("### 👑 Unlimited Premium")
-            st.markdown("## **$99.00 / mo**")
-            st.write("• **Unlimited Estimates Forever**")
-            st.write("• Uncapped Custom PDF Downloads")
