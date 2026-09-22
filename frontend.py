@@ -195,8 +195,7 @@ elif page_selection == "AI Estimate Engine":
             dimensions = st.text_input(dim_hint)
             materials_requested = st.text_area(mat_hint, height=120)
             zip_code = st.text_input("Job Zip Code / Region")
-            extra_notes = st.text_input("Extra Client Demands or Site Access Notes (Optional)")
-            extra_notes = st.text_input("Extra Notes (Optional)")
+            extra_notes = st.text_input("Extra Notes and Access Demands (Optional)")
             submit = st.form_submit_button("Generate Professional Estimate Array")
 
         if submit:
@@ -205,3 +204,4 @@ elif page_selection == "AI Estimate Engine":
             elif not os.environ.get("OPENAI_API_KEY"):
                 st.error("API Key missing in cloud setup.")
             else:
+                st.write("🔄 Calculating regional rates and compiling cost table...")
