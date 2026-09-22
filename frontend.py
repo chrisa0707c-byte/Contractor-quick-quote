@@ -14,6 +14,44 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- 🎨 THE ULTIMATE MIDNIGHT DARK-MODE SKIN OVERRIDES ---
+# Injecting direct CSS rules to style inputs, cards, and enforce a clean charcoal corporate aesthetic
+st.markdown("""
+    <style>
+        /* Force the core application background to a deep midnight charcoal slate */
+        .stApp {
+            background-color: #0b0f19 !important;
+            color: #f3f4f6 !important;
+        }
+        
+        /* Enforce crisp white high-visibility text on all standard headers */
+        h1, h2, h3, h4, p, label, .stMarkdown {
+            color: #ffffff !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+        }
+        
+        /* Style form container cards into glowing enterprise modules */
+        div[data-testid="stForm"] {
+            background-color: #111827 !important;
+            border: 1px solid #1f2937 !important;
+            border-radius: 8px !important;
+            padding: 2rem !important;
+        }
+        
+        /* Style internal text inputs to match the dark theme canvas */
+        div[data-testid="stTextInput"] input, div[data-testid="stTextArea"] textarea {
+            background-color: #1f2937 !important;
+            color: #ffffff !important;
+            border: 1px solid #374151 !important;
+            border-radius: 6px !important;
+        }
+        
+        /* Remove standard Streamlit footer visual branding branding rows */
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+    </style>
+""", unsafe_allow_html=True)
+
 # --- SECURE SUPABASE CLOUD DATABASE WIRES ---
 SUPABASE_URL = "https://supabase.co"
 SUPABASE_KEY = "sb_publishable_sJKogzgeJtD296ygXWd3rPExC2NlZTMzNmE0Y2M0YmFiNGM0NmY0YTllMDkyNDU1N2U3YTMxYzE4OGJhNGE5NDRlOGQyNTllNjc3ZDcyODRiZg=="
@@ -26,61 +64,36 @@ def init_supabase():
 
 supabase: Client = init_supabase()
 
-# --- INITIALIZE CORE SECURITY AND ACCOUNT STATES ---
-if "user_authenticated" not in st.session_state:
-    st.session_state["user_authenticated"] = False
-if "user_email" not in st.session_state:
-    st.session_state["user_email"] = None
-if 'quotes_used' not in st.session_state:
-    st.session_state['quotes_used'] = 0
+# --- INITIALIZE CORE SECURITY STATES ---
+if "quotes_used" not in st.session_state:
+    st.session_state["quotes_used"] = 0
 
 FREE_LIMIT = 5
-remaining_quotes = FREE_LIMIT - st.session_state['quotes_used']
+remaining_quotes = FREE_LIMIT - st.session_state["quotes_used"]
 
 # =========================================================
-# MONITOR 0: THE ENTERPRISE GATEWAY (LOG IN / SIGN UP)
+# MONITOR 0: NATIVE STREAMLIT AUTHENTICATION PORTAL GATEWAY
 # =========================================================
-if not st.session_state["user_authenticated"]:
-    st.title("Quick Quote AI - Enterprise Access Portal")
+# Using official native auth routing rules to completely avoid manual URL endpoint pathing
+if not st.experimental_user.is_logged_in:
+    st.title("Quick Quote AI")
+    st.subheader("Enterprise Workspace Access Portal")
     st.write("Secure multi-tenant workspace console. Authenticate your trade credentials to enter.")
     st.markdown("---")
+    st.info("Please click the controller below to securely log into your secure contractor vault.")
     
-    auth_mode = st.radio("Select Portal Action", ["Sign In to Account", "Create New Workspace (Sign Up)"])
-    
-    with st.form("auth_form", clear_on_submit=False):
-        email = st.text_input("Corporate Email Address")
-        password = st.text_input("Secure Vault Password", type="password")
-        submit_auth = st.form_submit_button("Authenticate Credentials")
-        
-    if submit_auth:
-        if not email or not password:
-            st.error("Authentication Error: All fields are required.")
-        elif not supabase:
-            st.error("Database Connection Offline.")
-        else:
-            if auth_mode == "Create New Workspace (Sign Up)":
-                try:
-                    res = supabase.auth.sign_up({"email": email, "password": password})
-                    st.success("Workspace Registered Successfully! Please check your email inbox to confirm your verification link, then toggle to Sign In.")
-                except Exception as e:
-                    st.error(f"Registration Failed: {str(e)}")
-            else:
-                try:
-                    res = supabase.auth.sign_in_with_password({"email": email, "password": password})
-                    if res.user:
-                        st.session_state["user_authenticated"] = True
-                        st.session_state["user_email"] = res.user.email
-                        st.success("Access Granted. Initializing console...")
-                        st.rerun()
-                except Exception as e:
-                    st.error(f"Access Denied: Invalid credentials. ({str(e)})")
+    # Renders an un-hackable, secure official login button linked straight to your secrets ecosystem
+    st.login()
     st.stop()
+
+# Capture the authenticated user's email cleanly from the secure environment layer
+current_user_email = st.experimental_user.get("email", "beta.contractor@quickquote.ai")
 
 # =========================================================
 # MONITOR 1: THE ACTIVE AUTHORIZED WORKSPACE
 # =========================================================
 st.sidebar.title("Quick Quote AI")
-st.sidebar.markdown(f"**Account:** `{st.session_state['user_email']}`")
+st.sidebar.markdown(f"**Account:** `{current_user_email}`")
 st.sidebar.markdown(f"**System Status:** `PRO BETA`")
 st.sidebar.markdown(f"**Usage Allocation:** `{remaining_quotes} / {FREE_LIMIT} Remaining`")
 st.sidebar.markdown("---")
@@ -96,10 +109,7 @@ page_selection = st.sidebar.radio("Navigate Enterprise Console", ["Platform Over
 
 st.sidebar.markdown("---")
 if st.sidebar.button("🔒 Securely Log Out of Console"):
-    if supabase:
-        supabase.auth.sign_out()
-    st.session_state["user_authenticated"] = False
-    st.session_state["user_email"] = None
+    st.logout()
     st.rerun()
 
 class LineItem(BaseModel):
@@ -158,7 +168,7 @@ if page_selection == "Platform Overview":
                 model="gpt-4o-mini",
                 messages=[{"role": "system", "content": "You are a customer assistant for a top contracting firm. Guide them smoothly to capture scope data."}, *st.session_state.messages]
             )
-            reply = response.choices[0].message.content
+            reply = response.choices.message.content
             st.session_state.messages.append({"role": "assistant", "content": reply})
             with st.chat_message("assistant"):
                 st.write(reply)
@@ -202,6 +212,3 @@ elif page_selection == "AI Estimate Engine":
             if not dimensions or not zip_code:
                 st.error("Please fill out Size and Zip Code.")
             elif not os.environ.get("OPENAI_API_KEY"):
-                st.error("API Key missing in cloud setup.")
-            else:
-                st.write("🔄 Activating Real-Time Price Indexing and calculating regional rates...")
