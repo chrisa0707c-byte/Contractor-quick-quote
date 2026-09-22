@@ -203,8 +203,4 @@ elif page_selection == "AI Estimate Engine":
                 st.write("🔄 Activating Real-Time Price Indexing and calculating regional rates...")
                 try:
                     client = OpenAI()
-                    system_prompt = (
-                        f"You are an expert construction estimator specialized exclusively in the field of: {user_trade}. "
-                        f"The current year is 2026. You must evaluate and calculate itemized material costs based on "
-                        f"current real-world commodity wholesale pricing index parameters for this specific trade asset class "
-                        f"(e.g., current regional lumber square metrics, PVC pipeline values, wiring inflation adjustments). "
+                    system_prompt = f"You are an expert construction estimator specialized exclusively in the field of: {user_trade}. The current year is 2026. You must evaluate and calculate itemized material costs based on current real-world commodity wholesale pricing index parameters for this specific trade asset class. Calibrate all labor calculations and material line items explicitly to match localized market rates for the provided geographic location parameter. Output highly accurate, industry-standard itemized matrices."
