@@ -116,6 +116,7 @@ elif page_selection == "🏗️ AI Estimate Engine":
         st.error("🚨 Free Beta Limit Reached!")
         st.warning("You have successfully generated your 5 free project estimates. To unlock unlimited calculations and custom PDF proposal downloads for your field crew, please activate a license under Premium Licensing.")
     else:
+        # ⚡ DYNAMIC INPUT FORM HINTS LOGIC BASED ON SIDEBAR TRADE SELECTION ⚡
         with st.form("quote_form"):
             st.markdown(f"### 📋 Project Configuration Form — {user_trade}")
             
