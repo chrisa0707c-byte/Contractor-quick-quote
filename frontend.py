@@ -15,8 +15,8 @@ st.set_page_config(
 )
 
 # --- SECURE SUPABASE CLOUD DATABASE WIRES ---
-SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
+SUPABASE_URL = "https://supabase.co"
+SUPABASE_KEY = "sb_publishable_sJKogzgeJtD296ygXWd3rPExC2NlZTMzNmE0Y2M0YmFiNGM0NmY0YTllMDkyNDU1N2U3YTMxYzE4OGJhNGE5NDRlOGQyNTllNjc3ZDcyODRiZg=="
 
 @st.cache_resource
 def init_supabase():
@@ -41,7 +41,7 @@ remaining_quotes = FREE_LIMIT - st.session_state['quotes_used']
 # MONITOR 0: THE ENTERPRISE GATEWAY (LOG IN / SIGN UP)
 # =========================================================
 if not st.session_state["user_authenticated"]:
-    st.title("🏗️ Quick Quote AI - Enterprise Access Portal")
+    st.title("Quick Quote AI - Enterprise Access Portal")
     st.write("Secure multi-tenant workspace console. Authenticate your trade credentials to enter.")
     st.markdown("---")
     
@@ -54,14 +54,14 @@ if not st.session_state["user_authenticated"]:
         
     if submit_auth:
         if not email or not password:
-            st.error("Authentication Error: All fields are strictly required.")
+            st.error("Authentication Error: All fields are required.")
         elif not supabase:
-            st.error("Database Connection Offline: Please verify your Supabase Cloud URL and API keys in your hosting secrets configuration.")
+            st.error("Database Connection Offline.")
         else:
             if auth_mode == "Create New Workspace (Sign Up)":
                 try:
                     res = supabase.auth.sign_up({"email": email, "password": password})
-                    st.success("🎉 Workspace Registered Successfully! Please check your email inbox to confirm your verification link, then toggle to Sign In.")
+                    st.success("Workspace Registered Successfully! Please check your email inbox to confirm your verification link, then toggle to Sign In.")
                 except Exception as e:
                     st.error(f"Registration Failed: {str(e)}")
             else:
@@ -73,7 +73,7 @@ if not st.session_state["user_authenticated"]:
                         st.success("Access Granted. Initializing console...")
                         st.rerun()
                 except Exception as e:
-                    st.error(f"Access Denied: Invalid corporate credentials. ({str(e)})")
+                    st.error(f"Access Denied: Invalid credentials. ({str(e)})")
     st.stop()
 
 # =========================================================
@@ -158,7 +158,7 @@ if page_selection == "Platform Overview":
                 model="gpt-4o-mini",
                 messages=[{"role": "system", "content": "You are a customer assistant for a top contracting firm. Guide them smoothly to capture scope data."}, *st.session_state.messages]
             )
-            reply = response.choices.message.content
+            reply = response.choices[0].message.content
             st.session_state.messages.append({"role": "assistant", "content": reply})
             with st.chat_message("assistant"):
                 st.write(reply)
@@ -204,3 +204,4 @@ elif page_selection == "AI Estimate Engine":
             elif not os.environ.get("OPENAI_API_KEY"):
                 st.error("API Key missing in cloud setup.")
             else:
+                st.write("🔄 Activating Real-Time Price Indexing and calculating regional rates...")
