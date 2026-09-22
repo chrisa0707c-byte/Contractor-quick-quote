@@ -4,6 +4,7 @@ from openai import OpenAI
 from pydantic import BaseModel
 from typing import List
 from pdf_builder import generate_pdf
+from supabase import create_client, Client
 
 # --- ENTERPRISE CONFIGURATION ---
 st.set_page_config(
@@ -13,20 +14,77 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- INITIALIZE TRIAL VALUE HUD COUNTER ---
+# --- SECURE SUPABASE CLOUD DATABASE WIRES ---
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
+
+@st.cache_resource
+def init_supabase():
+    if SUPABASE_URL and SUPABASE_KEY:
+        return create_client(SUPABASE_URL, SUPABASE_KEY)
+    return None
+
+supabase: Client = init_supabase()
+
+# --- INITIALIZE CORE SECURITY AND ACCOUNT STATES ---
+if "user_authenticated" not in st.session_state:
+    st.session_state["user_authenticated"] = False
+if "user_email" not in st.session_state:
+    st.session_state["user_email"] = None
 if 'quotes_used' not in st.session_state:
     st.session_state['quotes_used'] = 0
 
 FREE_LIMIT = 5
 remaining_quotes = FREE_LIMIT - st.session_state['quotes_used']
 
-# --- SIDEBAR HUD DISPLAY WITH MULTI-TRADE PROFILE SELECTOR ---
+# =========================================================
+# MONITOR 0: THE ENTERPRISE GATEWAY (LOG IN / SIGN UP)
+# =========================================================
+if not st.session_state["user_authenticated"]:
+    st.title("🏗️ Quick Quote AI - Enterprise Access Portal")
+    st.write("Secure multi-tenant workspace console. Authenticate your trade credentials to enter.")
+    st.markdown("---")
+    
+    auth_mode = st.radio("Select Portal Action", ["Sign In to Account", "Create New Workspace (Sign Up)"])
+    
+    with st.form("auth_form", clear_on_submit=False):
+        email = st.text_input("Corporate Email Address")
+        password = st.text_input("Secure Vault Password", type="password")
+        submit_auth = st.form_submit_button("Authenticate Credentials")
+        
+    if submit_auth:
+        if not email or not password:
+            st.error("Authentication Error: All fields are strictly required.")
+        elif not supabase:
+            st.error("Database Connection Offline: Please verify your Supabase Cloud URL and API keys in your hosting secrets configuration.")
+        else:
+            if auth_mode == "Create New Workspace (Sign Up)":
+                try:
+                    res = supabase.auth.sign_up({"email": email, "password": password})
+                    st.success("🎉 Workspace Registered Successfully! Please check your email inbox to confirm your verification link, then toggle to Sign In.")
+                except Exception as e:
+                    st.error(f"Registration Failed: {str(e)}")
+            else:
+                try:
+                    res = supabase.auth.sign_in_with_password({"email": email, "password": password})
+                    if res.user:
+                        st.session_state["user_authenticated"] = True
+                        st.session_state["user_email"] = res.user.email
+                        st.success("Access Granted. Initializing console...")
+                        st.rerun()
+                except Exception as e:
+                    st.error(f"Access Denied: Invalid corporate credentials. ({str(e)})")
+    st.stop()
+
+# =========================================================
+# MONITOR 1: THE ACTIVE AUTHORIZED WORKSPACE
+# =========================================================
 st.sidebar.title("Quick Quote AI")
+st.sidebar.markdown(f"**Account:** `{st.session_state['user_email']}`")
 st.sidebar.markdown(f"**System Status:** `PRO BETA`")
 st.sidebar.markdown(f"**Usage Allocation:** `{remaining_quotes} / {FREE_LIMIT} Remaining`")
 st.sidebar.markdown("---")
 
-# Onboarding Trade Profiler Matrix Injection
 user_trade = st.sidebar.selectbox(
     "Select Your Field Trade Profile:",
     ["General Contractor", "Roofer / Siding Tech", "Professional Plumber", "Master Electrician", "Carpenter / Deck Builder"]
@@ -36,7 +94,14 @@ st.sidebar.markdown("---")
 
 page_selection = st.sidebar.radio("Navigate Enterprise Console", ["Platform Overview", "AI Estimate Engine", "Premium Licensing"])
 
-# --- DATA MODEL HOOKS ---
+st.sidebar.markdown("---")
+if st.sidebar.button("🔒 Securely Log Out of Console"):
+    if supabase:
+        supabase.auth.sign_out()
+    st.session_state["user_authenticated"] = False
+    st.session_state["user_email"] = None
+    st.rerun()
+
 class LineItem(BaseModel):
     item_name: str
     quantity: float
@@ -51,9 +116,6 @@ class AIQuoteResponse(BaseModel):
     labor_list: List[LineItem]
     grand_total: float
 
-# =========================================================
-# MONITOR 1: BRAND SALES LANDING SUMMARY
-# =========================================================
 if page_selection == "Platform Overview":
     st.title("Stop Losing Construction Deals to Slow Estimates")
     st.subheader("Close residential clients directly from the driveway in under 30 seconds.")
@@ -75,7 +137,6 @@ if page_selection == "Platform Overview":
         
     st.markdown("---")
     
-    # THE CLIENT INQUIRY SUPPORT BOT PANEL
     st.subheader("Client Lead Generator Bot (Beta Preview)")
     st.write("Embed this bot directly on your website to catch project details while you sleep.")
     
@@ -97,16 +158,13 @@ if page_selection == "Platform Overview":
                 model="gpt-4o-mini",
                 messages=[{"role": "system", "content": "You are a customer assistant for a top contracting firm. Guide them smoothly to capture scope data."}, *st.session_state.messages]
             )
-            reply = response.choices[0].message.content
+            reply = response.choices.message.content
             st.session_state.messages.append({"role": "assistant", "content": reply})
             with st.chat_message("assistant"):
                 st.write(reply)
         except Exception as e:
             st.error(f"Bot Offline: {str(e)}")
 
-# =========================================================
-# MONITOR 2: GATED DYNAMIC ESTIMATION WORKSPACE
-# =========================================================
 elif page_selection == "AI Estimate Engine":
     st.title("Quick Quote AI Estimation Console")
     st.write(f"Input your raw parameters below. Your console has been dynamically tailored to: {user_trade}.")
@@ -138,6 +196,7 @@ elif page_selection == "AI Estimate Engine":
             materials_requested = st.text_area(mat_hint, height=120)
             zip_code = st.text_input("Job Zip Code / Region")
             extra_notes = st.text_input("Extra Client Demands or Site Access Notes (Optional)")
+            extra_notes = st.text_input("Extra Notes (Optional)")
             submit = st.form_submit_button("Generate Professional Estimate Array")
 
         if submit:
@@ -146,46 +205,3 @@ elif page_selection == "AI Estimate Engine":
             elif not os.environ.get("OPENAI_API_KEY"):
                 st.error("API Key missing in cloud setup.")
             else:
-                st.write("Calculating regional rates and compiling cost table...")
-                try:
-                    client = OpenAI()
-                    system_prompt = f"You are an expert construction estimator specialized exclusively in the field of: {user_trade}. Output highly accurate, professional itemized cost estimates matching this trade's exact current market metrics."
-                    user_prompt = f"Trade Context: {user_trade}\nMaterials/Specs: {materials_requested}\nScope/Dimensions: {dimensions}\nZip: {zip_code}\nNotes: {extra_notes}"
-                    
-                    completion = client.beta.chat.completions.parse(
-                        model="gpt-4o-mini",
-                        messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
-                        response_format=AIQuoteResponse,
-                    )
-                    st.session_state['data'] = completion.choices[0].message.parsed
-                    st.session_state['p_type'] = user_trade
-                    st.session_state['dims'] = dimensions
-                    st.session_state['zip_c'] = zip_code
-                    
-                    st.session_state['quotes_used'] += 1
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Error: {str(e)}")
-
-    if 'data' in st.session_state:
-        data = st.session_state['data']
-        st.success("Estimate Complete!")
-        
-        with st.container(border=True):
-            st.subheader(f"Grand Total: ${data.grand_total:.2f}")
-        st.write("")
-        
-        pdf_file = generate_pdf(data, st.session_state['p_type'], st.session_state['dims'], st.session_state['zip_c'])
-        st.download_button(label="Download Estimate Profile as PDF", data=pdf_file, file_name=f"Estimate_{st.session_state['p_type'].replace(' ', '_')}.pdf", mime="application/pdf")
-        
-        st.write(f"**Justification:** {data.business_justification}")
-        st.write(f"**Days to Complete:** {data.estimated_days_to_complete} business days")
-        
-        st.markdown("### Materials Itemization")
-        mat_table = [{"Item Name": m.item_name, "Qty": m.quantity, "Unit": m.unit, "Cost/Unit": f"${m.estimated_cost_per_unit:.2f}", "Total": f"${m.total_item_cost:.2f}"} for m in data.materials_list]
-        st.dataframe(mat_table, use_container_width=True)
-            
-        st.markdown("### Regional Labor Costs")
-        lab_table = [{"Operation": l.item_name, "Hours/Qty": l.quantity, "Unit": l.unit, "Rate/Unit": f"${l.estimated_cost_per_unit:.2f}", "Total": f"${l.total_item_cost:.2f}"} for l in data.labor_list]
-        st.dataframe(lab_table, use_container_width=True)
-
