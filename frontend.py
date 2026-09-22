@@ -88,14 +88,12 @@ if not st.session_state["user_authenticated"]:
         else:
             if auth_mode == "Create New Workspace (Sign Up)":
                 try:
-                    # Clean parameter passing directly into the registration layer
                     res = supabase.auth.sign_up({"email": email, "password": password})
                     st.success("🎉 Workspace Registered Successfully! Please check your email inbox to confirm your verification link, then toggle to Sign In.")
                 except Exception as e:
                     st.error(f"Registration Failed: {str(e)}")
             else:
                 try:
-                    # Fixed programmatic validation bridge checks credentials against your cloud project fields
                     res = supabase.auth.sign_in_with_password({"email": email, "password": password})
                     if res and res.user:
                         st.session_state["user_authenticated"] = True
@@ -201,16 +199,18 @@ elif page_selection == "AI Estimate Engine":
         st.error("Free Beta Limit Reached!")
         st.warning("You have successfully generated your 5 free project estimates. To unlock unlimited calculations and custom PDF proposal downloads for your field crew, please activate a license under Premium Licensing.")
     else:
-        with st.form("quote_form"):
-            st.markdown(f"### Project Configuration Form — {user_trade}")
-            
-            if "Roofer" in user_trade:
-                dim_hint = "Project Size / Scope (e.g., 25 Squares, 2500 sq ft, 8/12 Pitch Angle)"
-                mat_hint = "Required Materials & Specifications (e.g., Timberline HDZ Shingles, Synthetic Underlayment, Ice & Water Shield)"
-            elif "Plumber" in user_trade:
-                dim_hint = "Project Size / Scope (e.g., 3-Bathroom Rough-In, 40 Linear Feet of Trenching)"
-                mat_hint = "Required Materials & Specifications (e.g., Schedule 40 PVC, Copper PEX Piping, Fixture counts and brands)"
-            elif "Electrician" in user_trade:
-                dim_hint = "Project Size / Scope (e.g., 200 Amp Service Upgrade, 2500 sq ft House Rewire)"
-                mat_hint = "Required Materials & Specifications (e.g., Romex 14/2 Wire, Siemens Panel Board, Outlet/Switch counts)"
-            elif "Carpenter" in user_trade:
+        # Define placeholders before the form structure to prevent reference sequence overrides
+        dim_hint = "Project Parameters / Sizing Data"
+        mat_hint = "Paste your raw text layout parameters, labor tasks, or material counts here"
+        
+        if "Roofer" in user_trade:
+            dim_hint = "Project Size / Scope (e.g., 25 Squares, 2500 sq ft, 8/12 Pitch Angle)"
+            mat_hint = "Required Materials & Specifications (e.g., Timberline HDZ Shingles, Synthetic Underlayment, Ice & Water Shield)"
+        elif "Plumber" in user_trade:
+            dim_hint = "Project Size / Scope (e.g., 3-Bathroom Rough-In, 40 Linear Feet of Trenching)"
+            mat_hint = "Required Materials & Specifications (e.g., Schedule 40 PVC, Copper PEX Piping, Fixture counts and brands)"
+        elif "Electrician" in user_trade:
+            dim_hint = "Project Size / Scope (e.g., 200 Amp Service Upgrade, 2500 sq ft House Rewire)"
+            mat_hint = "Required Materials & Specifications (e.g., Romex 14/2 Wire, Siemens Panel Board, Outlet/Switch counts)"
+        elif "Carpenter" in user_trade:
+            dim_hint = "Project Size / Scope (e.g., 16x20 Floating Deck, 80 Linear Feet of Privacy Fencing)"
