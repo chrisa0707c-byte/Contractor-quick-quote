@@ -154,7 +154,7 @@ if page_selection == "Platform Overview":
                 model="gpt-4o-mini",
                 messages=[{"role": "system", "content": "You are a customer assistant for a top contracting firm. Guide them smoothly to capture scope data."}, *st.session_state.messages]
             )
-            reply = response.choices.message.content
+            reply = response.choices[0].message.content
             st.session_state.messages.append({"role": "assistant", "content": reply})
             with st.chat_message("assistant"):
                 st.write(reply)
