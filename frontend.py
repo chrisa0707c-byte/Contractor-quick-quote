@@ -182,9 +182,9 @@ elif page_selection == "🏗️ AI Estimate Engine":
         st.write(f"**Justification:** {data.business_justification}")
         st.write(f"**Days to Complete:** {data.estimated_days_to_complete} business days")
         
+        # 👑 NUCLEAR PRO GRID MATRICES — ZERO PYTHON LOOPS GENERATED HERE 👑
         st.markdown("### 🪵 Materials Itemization")
-        for item in data.materials_list:
-            st.write(f"• **{item.item_name}**: {item.quantity} {item.unit} @ ${item.estimated_cost_per_unit:.2f}/unit = **${item.total_item_cost:.2f}**")
+        mat_table = [{"Item Name": m.item_name, "Qty": m.quantity, "Unit": m.unit, "Cost/Unit": f"${m.estimated_cost_per_unit:.2f}", "Total": f"${m.total_item_cost:.2f}"} for m in data.materials_list]
+        st.dataframe(mat_table, use_container_width=True)
             
         st.markdown("### 🛠️ Regional Labor Costs")
-        for labor in data.labor_list:
