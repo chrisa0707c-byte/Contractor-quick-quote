@@ -204,4 +204,3 @@ elif page_selection == "AI Estimate Engine":
             elif not os.environ.get("OPENAI_API_KEY"):
                 st.error("API Key missing in cloud setup.")
             else:
-                st.write("🔄 Calculating regional rates and compiling cost table...")
