@@ -14,29 +14,58 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 🎨 THE ULTIMATE MIDNIGHT DARK-MODE SKIN OVERRIDES ---
+# --- 🎨 THE ULTIMATE HIGH-VISIBILITY MIDNIGHT SLATE OVERRIDES ---
 st.markdown("""
     <style>
+        /* Force core backdrop to a slick, deep midnight canvas slate */
         .stApp {
             background-color: #0b0f19 !important;
             color: #f3f4f6 !important;
         }
+        
+        /* Enforce crisp white high-visibility text on headings and labels */
         h1, h2, h3, h4, p, label, .stMarkdown {
             color: #ffffff !important;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
         }
+        
+        /* Turn container cards into dark glowing enterprise pods */
         div[data-testid="stForm"] {
             background-color: #111827 !important;
             border: 1px solid #1f2937 !important;
             border-radius: 8px !important;
             padding: 2rem !important;
         }
+        
+        /* Turn form inputs into crisp, dark fields with solid gray framing borders */
         div[data-testid="stTextInput"] input, div[data-testid="stTextArea"] textarea {
             background-color: #1f2937 !important;
             color: #ffffff !important;
-            border: 1px solid #374151 !important;
+            border: 1px solid #4b5563 !important;
             border-radius: 6px !important;
         }
+        
+        /* 🚨 CO-FABRICATED HIGH-VISIBILITY BUTTON BUTTON HOOKS 🚨 */
+        /* Forces buttons to remain fully visible, bright, and solid without requiring hovers */
+        button, .stButton button, div[data-testid="stForm"] button {
+            background-color: #1f2937 !important;
+            color: #ffffff !important;
+            border: 2px solid #6366f1 !important; /* Premium electric indigo border profile */
+            border-radius: 6px !important;
+            font-weight: 600 !important;
+            padding: 0.5rem 1.5rem !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        /* Micro-styled crisp interaction lift on direct cursor hover events */
+        button:hover, .stButton button:hover {
+            background-color: #2563eb !important; /* Deep sapphire blue hover transformation state */
+            border-color: #3b82f6 !important;
+            color: #ffffff !important;
+        }
+        
+        /* Fully hide native Streamlit hosting telemetry layout tags */
         footer {visibility: hidden;}
         header {visibility: hidden;}
     </style>
@@ -54,61 +83,34 @@ def init_supabase():
 
 supabase: Client = init_supabase()
 
-# --- INITIALIZE CORE SECURITY AND ACCOUNT STATES ---
-if "user_authenticated" not in st.session_state:
-    st.session_state["user_authenticated"] = False
-if "user_email" not in st.session_state:
-    st.session_state["user_email"] = None
-if 'quotes_used' not in st.session_state:
-    st.session_state['quotes_used'] = 0
+# --- INITIALIZE CORE SECURITY STATES ---
+if "quotes_used" not in st.session_state:
+    st.session_state["quotes_used"] = 0
 
 FREE_LIMIT = 5
-remaining_quotes = FREE_LIMIT - st.session_state['quotes_used']
+remaining_quotes = FREE_LIMIT - st.session_state["quotes_used"]
 
 # =========================================================
-# MONITOR 0: THE ENTERPRISE GATEWAY (LOG IN / SIGN UP)
+# MONITOR 0: NATIVE STREAMLIT AUTHENTICATION PORTAL GATEWAY
 # =========================================================
-if not st.session_state["user_authenticated"]:
-    st.title("Quick Quote AI - Enterprise Access Portal")
+# Leveraging native ecosystem triggers to bypass manual URL path updates permanently
+if not st.experimental_user.is_logged_in:
+    st.title("Quick Quote AI")
+    st.subheader("Enterprise Workspace Access Portal")
     st.write("Secure multi-tenant workspace console. Authenticate your trade credentials to enter.")
     st.markdown("---")
+    st.write("Please click the controller below to securely log into your secure contractor calculation vault.")
     
-    auth_mode = st.radio("Select Portal Action", ["Sign In to Account", "Create New Workspace (Sign Up)"])
-    
-    with st.form("auth_form", clear_on_submit=False):
-        email = st.text_input("Corporate Email Address")
-        password = st.text_input("Secure Vault Password", type="password")
-        submit_auth = st.form_submit_button("Authenticate Credentials")
-        
-    if submit_auth:
-        if not email or not password:
-            st.error("Authentication Error: All fields are strictly required.")
-        elif not supabase:
-            st.error("Database Connection Offline.")
-        else:
-            if auth_mode == "Create New Workspace (Sign Up)":
-                try:
-                    res = supabase.auth.sign_up({"email": email, "password": password})
-                    st.success("🎉 Workspace Registered Successfully! Please check your email inbox to confirm your verification link, then toggle to Sign In.")
-                except Exception as e:
-                    st.error(f"Registration Failed: {str(e)}")
-            else:
-                try:
-                    res = supabase.auth.sign_in_with_password({"email": email, "password": password})
-                    if res and res.user:
-                        st.session_state["user_authenticated"] = True
-                        st.session_state["user_email"] = res.user.email
-                        st.success("Access Granted. Initializing console...")
-                        st.rerun()
-                except Exception as e:
-                    st.error(f"Access Denied: Invalid credentials. ({str(e)})")
+    st.login()
     st.stop()
+
+current_user_email = st.experimental_user.get("email", "beta.contractor@quickquote.ai")
 
 # =========================================================
 # MONITOR 1: THE ACTIVE AUTHORIZED WORKSPACE
 # =========================================================
 st.sidebar.title("Quick Quote AI")
-st.sidebar.markdown(f"**Account:** `{st.session_state['user_email']}`")
+st.sidebar.markdown(f"**Account:** `{current_user_email}`")
 st.sidebar.markdown(f"**System Status:** `PRO BETA`")
 st.sidebar.markdown(f"**Usage Allocation:** `{remaining_quotes} / {FREE_LIMIT} Remaining`")
 st.sidebar.markdown("---")
@@ -124,8 +126,7 @@ page_selection = st.sidebar.radio("Navigate Enterprise Console", ["Platform Over
 
 st.sidebar.markdown("---")
 if st.sidebar.button("🔒 Securely Log Out of Console"):
-    st.session_state["user_authenticated"] = False
-    st.session_state["user_email"] = None
+    st.logout()
     st.rerun()
 
 class LineItem(BaseModel):
@@ -199,18 +200,20 @@ elif page_selection == "AI Estimate Engine":
         st.error("Free Beta Limit Reached!")
         st.warning("You have successfully generated your 5 free project estimates. To unlock unlimited calculations and custom PDF proposal downloads for your field crew, please activate a license under Premium Licensing.")
     else:
-        # Define placeholders before the form structure to prevent reference sequence overrides
-        dim_hint = "Project Parameters / Sizing Data"
-        mat_hint = "Paste your raw text layout parameters, labor tasks, or material counts here"
-        
-        if "Roofer" in user_trade:
-            dim_hint = "Project Size / Scope (e.g., 25 Squares, 2500 sq ft, 8/12 Pitch Angle)"
-            mat_hint = "Required Materials & Specifications (e.g., Timberline HDZ Shingles, Synthetic Underlayment, Ice & Water Shield)"
-        elif "Plumber" in user_trade:
-            dim_hint = "Project Size / Scope (e.g., 3-Bathroom Rough-In, 40 Linear Feet of Trenching)"
-            mat_hint = "Required Materials & Specifications (e.g., Schedule 40 PVC, Copper PEX Piping, Fixture counts and brands)"
-        elif "Electrician" in user_trade:
-            dim_hint = "Project Size / Scope (e.g., 200 Amp Service Upgrade, 2500 sq ft House Rewire)"
-            mat_hint = "Required Materials & Specifications (e.g., Romex 14/2 Wire, Siemens Panel Board, Outlet/Switch counts)"
-        elif "Carpenter" in user_trade:
-            dim_hint = "Project Size / Scope (e.g., 16x20 Floating Deck, 80 Linear Feet of Privacy Fencing)"
+        with st.form("quote_form"):
+            st.markdown(f"### Project Configuration Form — {user_trade}")
+            
+            dim_hint = "Project Parameters / Sizing Data"
+            mat_hint = "Paste your raw text layout parameters, labor tasks, or material counts here"
+            
+            if "Roofer" in user_trade:
+                dim_hint = "Project Size / Scope (e.g., 25 Squares, 2500 sq ft, 8/12 Pitch Angle)"
+                mat_hint = "Required Materials & Specifications (e.g., Timberline HDZ Shingles, Synthetic Underlayment, Ice & Water Shield)"
+            elif "Plumber" in user_trade:
+                dim_hint = "Project Size / Scope (e.g., 3-Bathroom Rough-In, 40 Linear Feet of Trenching)"
+                mat_hint = "Required Materials & Specifications (e.g., Schedule 40 PVC, Copper PEX Piping, Fixture counts and brands)"
+            elif "Electrician" in user_trade:
+                dim_hint = "Project Size / Scope (e.g., 200 Amp Service Upgrade, 2500 sq ft House Rewire)"
+                mat_hint = "Required Materials & Specifications (e.g., Romex 14/2 Wire, Siemens Panel Board, Outlet/Switch counts)"
+            elif "Carpenter" in user_trade:
+                dim_hint = "Project Size / Scope (e.g., 16x20 Floating Deck, 80 Linear Feet of Privacy Fencing)"
