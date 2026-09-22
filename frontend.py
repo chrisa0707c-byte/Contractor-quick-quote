@@ -37,8 +37,6 @@ st.markdown("""
             border: 1px solid #4b5563 !important;
             border-radius: 6px !important;
         }
-        
-        /* High-Visibility Custom Button Styling Hooks */
         button, .stButton button, div[data-testid="stForm"] button {
             background-color: #1f2937 !important;
             color: #ffffff !important;
@@ -99,19 +97,18 @@ if not st.session_state["user_authenticated"]:
         
     if submit_auth:
         if not email or not password:
-            st.error("Authentication Error: All fields are strictly required.")
+            st.error("Authentication Error: All fields are required.")
         elif not supabase:
             st.error("Database Connection Offline.")
         else:
             if auth_mode == "Create New Workspace (Sign Up)":
                 try:
                     res = supabase.auth.sign_up({"email": email, "password": password})
-                    st.success("🎉 Workspace Registered Successfully! Please check your email inbox to confirm your verification link, then toggle to Sign In.")
+                    st.success("🎉 Workspace Registered! Please check your email inbox to confirm your verification link, then toggle to Sign In.")
                 except Exception as e:
                     st.error(f"Registration Failed: {str(e)}")
             else:
                 try:
-                    # Session layer verification completely avoiding manual URL paths or experimental_user calls
                     res = supabase.auth.sign_in_with_password({"email": email, "password": password})
                     if res and res.user:
                         st.session_state["user_authenticated"] = True
@@ -217,11 +214,11 @@ elif page_selection == "AI Estimate Engine":
         st.error("Free Beta Limit Reached!")
         st.warning("You have successfully generated your 5 free project estimates. To unlock unlimited calculations and custom PDF proposal downloads for your field crew, please activate a license under Premium Licensing.")
     else:
-        with st.form("quote_form"):
-            st.markdown(f"### Project Configuration Form — {user_trade}")
-            
-            dim_hint = "Project Parameters / Sizing Data"
-            mat_hint = "Paste your raw text layout parameters, labor tasks, or material counts here"
-            
-            if "Roofer" in user_trade:
-                dim_hint = "Project Size / Scope (e.g., 25 Squares, 2500 sq ft, 8/12 Pitch Angle)"
+        dim_hint = "Project Parameters / Sizing Data"
+        mat_hint = "Paste your raw text layout parameters, labor tasks, or material counts here"
+        
+        if "Roofer" in user_trade:
+            dim_hint = "Project Size / Scope (e.g., 25 Squares, 2500 sq ft, 8/12 Pitch Angle)"
+            mat_hint = "Required Materials & Specifications (e.g., Timberline HDZ Shingles, Synthetic Underlayment, Ice & Water Shield)"
+        elif "Plumber" in user_trade:
+            dim_hint = "Project Size / Scope (e.g., 3-Bathroom Rough-In, 40 Linear Feet of Trenching)"
