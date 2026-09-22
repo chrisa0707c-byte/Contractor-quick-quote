@@ -15,38 +15,28 @@ st.set_page_config(
 )
 
 # --- 🎨 THE ULTIMATE MIDNIGHT DARK-MODE SKIN OVERRIDES ---
-# Injecting direct CSS rules to style inputs, cards, and enforce a clean charcoal corporate aesthetic
 st.markdown("""
     <style>
-        /* Force the core application background to a deep midnight charcoal slate */
         .stApp {
             background-color: #0b0f19 !important;
             color: #f3f4f6 !important;
         }
-        
-        /* Enforce crisp white high-visibility text on all standard headers */
         h1, h2, h3, h4, p, label, .stMarkdown {
             color: #ffffff !important;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
         }
-        
-        /* Style form container cards into glowing enterprise modules */
         div[data-testid="stForm"] {
             background-color: #111827 !important;
             border: 1px solid #1f2937 !important;
             border-radius: 8px !important;
             padding: 2rem !important;
         }
-        
-        /* Style internal text inputs to match the dark theme canvas */
         div[data-testid="stTextInput"] input, div[data-testid="stTextArea"] textarea {
             background-color: #1f2937 !important;
             color: #ffffff !important;
             border: 1px solid #374151 !important;
             border-radius: 6px !important;
         }
-        
-        /* Remove standard Streamlit footer visual branding branding rows */
         footer {visibility: hidden;}
         header {visibility: hidden;}
     </style>
@@ -74,19 +64,15 @@ remaining_quotes = FREE_LIMIT - st.session_state["quotes_used"]
 # =========================================================
 # MONITOR 0: NATIVE STREAMLIT AUTHENTICATION PORTAL GATEWAY
 # =========================================================
-# Using official native auth routing rules to completely avoid manual URL endpoint pathing
 if not st.experimental_user.is_logged_in:
     st.title("Quick Quote AI")
     st.subheader("Enterprise Workspace Access Portal")
     st.write("Secure multi-tenant workspace console. Authenticate your trade credentials to enter.")
     st.markdown("---")
     st.info("Please click the controller below to securely log into your secure contractor vault.")
-    
-    # Renders an un-hackable, secure official login button linked straight to your secrets ecosystem
     st.login()
     st.stop()
 
-# Capture the authenticated user's email cleanly from the secure environment layer
 current_user_email = st.experimental_user.get("email", "beta.contractor@quickquote.ai")
 
 # =========================================================
@@ -212,3 +198,13 @@ elif page_selection == "AI Estimate Engine":
             if not dimensions or not zip_code:
                 st.error("Please fill out Size and Zip Code.")
             elif not os.environ.get("OPENAI_API_KEY"):
+                st.error("API Key missing in cloud setup.")
+            else:
+                st.write("🔄 Activating Real-Time Price Indexing and calculating regional rates...")
+                try:
+                    client = OpenAI()
+                    system_prompt = (
+                        f"You are an expert construction estimator specialized exclusively in the field of: {user_trade}. "
+                        f"The current year is 2026. You must evaluate and calculate itemized material costs based on "
+                        f"current real-world commodity wholesale pricing index parameters for this specific trade asset class "
+                        f"(e.g., current regional lumber square metrics, PVC pipeline values, wiring inflation adjustments). "
