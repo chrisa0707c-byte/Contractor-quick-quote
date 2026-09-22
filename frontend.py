@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from typing import List
 from pdf_builder import generate_pdf
 
-# --- CLEAN ENTERPRISE CONFIGURATION ---
+# --- ENTERPRISE CONFIGURATION ---
 st.set_page_config(
     page_title="Quick Quote AI - Premium Console", 
     page_icon="🏗️", 
@@ -21,21 +21,20 @@ FREE_LIMIT = 5
 remaining_quotes = FREE_LIMIT - st.session_state['quotes_used']
 
 # --- SIDEBAR HUD DISPLAY WITH MULTI-TRADE PROFILE SELECTOR ---
-st.sidebar.image("https://icons8.com", width=65)
 st.sidebar.title("Quick Quote AI")
-st.sidebar.markdown(f"**⚡ System Status:** `PRO BETA`")
-st.sidebar.markdown(f"**📊 Usage Allocation:** `{remaining_quotes} / {FREE_LIMIT} Remaining`")
+st.sidebar.markdown(f"**System Status:** `PRO BETA`")
+st.sidebar.markdown(f"**Usage Allocation:** `{remaining_quotes} / {FREE_LIMIT} Remaining`")
 st.sidebar.markdown("---")
 
-# 🧰 The Onboarding Trade Profiler Matrix Injection
+# Onboarding Trade Profiler Matrix Injection
 user_trade = st.sidebar.selectbox(
     "Select Your Field Trade Profile:",
-    ["🏗️ General Contractor", "🏠 Roofer / Siding Tech", "🪠 Professional Plumber", "⚡ Master Electrician", "🪵 Carpenter / Deck Builder"]
+    ["General Contractor", "Roofer / Siding Tech", "Professional Plumber", "Master Electrician", "Carpenter / Deck Builder"]
 )
-st.sidebar.success(f"Workspace optimized for: **{user_trade}**")
+st.sidebar.success(f"Workspace optimized for: {user_trade}")
 st.sidebar.markdown("---")
 
-page_selection = st.sidebar.radio("Navigate Enterprise Console", ["🏠 Platform Overview", "🏗️ AI Estimate Engine", "💳 Premium Licensing"])
+page_selection = st.sidebar.radio("Navigate Enterprise Console", ["Platform Overview", "AI Estimate Engine", "Premium Licensing"])
 
 # --- DATA MODEL HOOKS ---
 class LineItem(BaseModel):
@@ -55,29 +54,29 @@ class AIQuoteResponse(BaseModel):
 # =========================================================
 # MONITOR 1: BRAND SALES LANDING SUMMARY
 # =========================================================
-if page_selection == "🏠 Platform Overview":
-    st.title("🏗️ Stop Losing Construction Deals to Slow Estimates")
+if page_selection == "Platform Overview":
+    st.title("Stop Losing Construction Deals to Slow Estimates")
     st.subheader("Close residential clients directly from the driveway in under 30 seconds.")
     st.write("")
     
     col1, col2, col3 = st.columns(3)
     with col1:
         with st.container(border=True):
-            st.markdown("### ⚡ 30-Second Quotes")
+            st.markdown("### 30-Second Quotes")
             st.write("Ditch evening paperwork. Type parameters right at the job site and let regional AI models construct cost itemizations instantly.")
     with col2:
         with st.container(border=True):
-            st.markdown("### 🧾 Zero Speculation")
+            st.markdown("### Zero Speculation")
             st.write("Build massive customer trust. Hand your client a transparent material and labor breakdown that removes price haggling completely.")
     with col3:
         with st.container(border=True):
-            st.markdown("### 📥 Instant PDF Delivery")
+            st.markdown("### Instant PDF Delivery")
             st.write("Generate professional proposals instantly. Click one button to compile and text or email a polished quote before your competitors leave the job site.")
         
     st.markdown("---")
     
     # THE CLIENT INQUIRY SUPPORT BOT PANEL
-    st.subheader("🤖 Client Lead Generator Bot (Beta Preview)")
+    st.subheader("Client Lead Generator Bot (Beta Preview)")
     st.write("Embed this bot directly on your website to catch project details while you sleep.")
     
     if "messages" not in st.session_state:
@@ -108,16 +107,16 @@ if page_selection == "🏠 Platform Overview":
 # =========================================================
 # MONITOR 2: GATED DYNAMIC ESTIMATION WORKSPACE
 # =========================================================
-elif page_selection == "🏗️ AI Estimate Engine":
-    st.title("🏗️ Quick Quote AI Estimation Console")
-    st.write(f"Input your raw parameters below. Your console has been dynamically tailored to: **{user_trade}**.")
+elif page_selection == "AI Estimate Engine":
+    st.title("Quick Quote AI Estimation Console")
+    st.write(f"Input your raw parameters below. Your console has been dynamically tailored to: {user_trade}.")
     
     if st.session_state['quotes_used'] >= FREE_LIMIT:
-        st.error("🚨 Free Beta Limit Reached!")
+        st.error("Free Beta Limit Reached!")
         st.warning("You have successfully generated your 5 free project estimates. To unlock unlimited calculations and custom PDF proposal downloads for your field crew, please activate a license under Premium Licensing.")
     else:
         with st.form("quote_form"):
-            st.markdown(f"### 📋 Project Configuration Form — {user_trade}")
+            st.markdown(f"### Project Configuration Form — {user_trade}")
             
             if "Roofer" in user_trade:
                 dim_hint = "Project Size / Scope (e.g., 25 Squares, 2500 sq ft, 8/12 Pitch Angle)"
@@ -147,7 +146,7 @@ elif page_selection == "🏗️ AI Estimate Engine":
             elif not os.environ.get("OPENAI_API_KEY"):
                 st.error("API Key missing in cloud setup.")
             else:
-                st.write("🔄 Calculating regional rates and compiling cost table...")
+                st.write("Calculating regional rates and compiling cost table...")
                 try:
                     client = OpenAI()
                     system_prompt = f"You are an expert construction estimator specialized exclusively in the field of: {user_trade}. Output highly accurate, professional itemized cost estimates matching this trade's exact current market metrics."
@@ -170,21 +169,23 @@ elif page_selection == "🏗️ AI Estimate Engine":
 
     if 'data' in st.session_state:
         data = st.session_state['data']
-        st.success("🎉 Estimate Complete!")
+        st.success("Estimate Complete!")
         
         with st.container(border=True):
-            st.subheader(f"💰 Grand Total: ${data.grand_total:.2f}")
+            st.subheader(f"Grand Total: ${data.grand_total:.2f}")
         st.write("")
         
         pdf_file = generate_pdf(data, st.session_state['p_type'], st.session_state['dims'], st.session_state['zip_c'])
-        st.download_button(label="📥 Download Estimate Profile as PDF", data=pdf_file, file_name=f"Estimate_{st.session_state['p_type'].replace(' ', '_')}.pdf", mime="application/pdf")
+        st.download_button(label="Download Estimate Profile as PDF", data=pdf_file, file_name=f"Estimate_{st.session_state['p_type'].replace(' ', '_')}.pdf", mime="application/pdf")
         
         st.write(f"**Justification:** {data.business_justification}")
         st.write(f"**Days to Complete:** {data.estimated_days_to_complete} business days")
         
-        # 👑 NUCLEAR PRO GRID MATRICES — ZERO PYTHON LOOPS GENERATED HERE 👑
-        st.markdown("### 🪵 Materials Itemization")
+        st.markdown("### Materials Itemization")
         mat_table = [{"Item Name": m.item_name, "Qty": m.quantity, "Unit": m.unit, "Cost/Unit": f"${m.estimated_cost_per_unit:.2f}", "Total": f"${m.total_item_cost:.2f}"} for m in data.materials_list]
         st.dataframe(mat_table, use_container_width=True)
             
-        st.markdown("### 🛠️ Regional Labor Costs")
+        st.markdown("### Regional Labor Costs")
+        lab_table = [{"Operation": l.item_name, "Hours/Qty": l.quantity, "Unit": l.unit, "Rate/Unit": f"${l.estimated_cost_per_unit:.2f}", "Total": f"${l.total_item_cost:.2f}"} for l in data.labor_list]
+        st.dataframe(lab_table, use_container_width=True)
+
