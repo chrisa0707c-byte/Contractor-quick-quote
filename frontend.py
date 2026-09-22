@@ -154,7 +154,7 @@ if page_selection == "Platform Overview":
                 model="gpt-4o-mini",
                 messages=[{"role": "system", "content": "You are a customer assistant for a top contracting firm. Guide them smoothly to capture scope data."}, *st.session_state.messages]
             )
-            reply = response.choices[0].message.content
+            reply = response.choices.message.content
             st.session_state.messages.append({"role": "assistant", "content": reply})
             with st.chat_message("assistant"):
                 st.write(reply)
@@ -201,6 +201,5 @@ elif page_selection == "AI Estimate Engine":
                 st.error("API Key missing in cloud setup.")
             else:
                 st.write("🔄 Activating Real-Time Price Indexing and calculating regional rates...")
-                try:
-                    client = OpenAI()
-                    system_prompt = f"You are an expert construction estimator specialized exclusively in the field of: {user_trade}. The current year is 2026. You must evaluate and calculate itemized material costs based on current real-world commodity wholesale pricing index parameters for this specific trade asset class. Calibrate all labor calculations and material line items explicitly to match localized market rates for the provided geographic location parameter. Output highly accurate, industry-standard itemized matrices."
+                client = OpenAI()
+                system_prompt = f"You are an expert construction estimator specialized exclusively in the field of: {user_trade}. The current year is 2026. You must evaluate and calculate itemized material costs based on current real-world commodity wholesale pricing index parameters for this specific trade asset class. Calibrate all labor calculations and material line items explicitly to match localized market rates for the provided geographic location parameter. Output highly accurate, industry-standard itemized matrices."
