@@ -131,7 +131,6 @@ with tab1:
     if 'data' in st.session_state:
         data = st.session_state['data']
         st.success("Estimate Complete and Appended to Local Session Workspace!")
-        
         st.markdown(f"### Grand Total: ${data.grand_total:.2f}")
         
         pdf_file = generate_pdf(data, st.session_state['p_type'], st.session_state['dims'], st.session_state['zip_c'], logo_image=st.session_state['uploaded_logo'], firm_name=st.session_state['company_name'])
@@ -154,8 +153,8 @@ with tab2:
     st.write("Customize your active crew specification parameters, upload company branding assets, and review history logs.")
     st.markdown("---")
     
-    col_prof1, col_prof2 = st.columns(2)
-    with col_prof1:
+    col_p1, col_p2 = st.columns(2)
+    with col_p1:
         st.markdown("### Crew Specifications")
         st.session_state['base_labor_rate'] = st.number_input("Base Crew Labor Rate ($ / Hour)", min_value=10.0, max_value=500.0, value=st.session_state['base_labor_rate'], step=5.0)
         st.session_state['company_markup'] = st.number_input("Company Profit Markup Margin (%)", min_value=0.0, max_value=200.0, value=st.session_state['company_markup'], step=2.5)
@@ -167,7 +166,7 @@ with tab2:
             st.session_state['uploaded_logo'] = uploaded_file.read()
             st.success("Corporate Branding Asset Connected Successfully to Active Workspace!")
             
-    with col_prof2:
+    with col_p2:
         st.markdown("### Session Project Ledger")
         if not st.session_state['quotes_history']:
             st.info("No active project quotes running inside this workspace session.")
@@ -178,14 +177,15 @@ with tab2:
                 st.session_state['quotes_history'] = []
                 st.rerun()
 
-# --- TAB 3: PREMIUM LICENSING HUB (FLATTENED EXTRA-SAFE FORMAT) ---
+# --- TAB 3: PREMIUM LICENSING HUB (FIXED CLICKABLE INTERFACE) ---
 with tab3:
     st.title("Secure Your Active Enterprise License")
     st.write("Unlock the absolute driveway sales weapon for your field operations crew.")
     st.markdown("---")
     
-    st.markdown("### Choose Your Plan Tier")
+    st.subheader("Choose Your Plan Tier")
+    st.write("Click any plan option to open Stripe's encrypted payment gateway directly.")
+    st.write("")
     
-    st.markdown("#### 1. Free Test Tier — $0.00 / mo")
-    st.write("Inclusions: 5 Total Estimates Max | On-Screen Calculator Grid | Parameter Saves")
-    st.write("Status: Active Profile Option")
+    # Flat layout framework utilizing clean bulletproof functional buttons
+    st.markdown("### 1. Free Test Tier")
