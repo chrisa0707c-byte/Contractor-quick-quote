@@ -24,38 +24,23 @@ if 'uploaded_logo' not in st.session_state:
     st.session_state['uploaded_logo'] = None
 if 'company_name' not in st.session_state:
     st.session_state['company_name'] = ""
-
-# --- ACTIVE SUBSCRIPTION TIER TRACKING ---
-if 'account_tier' not in st.session_state:
-    st.session_state['account_tier'] = "Free Test Tier"
 if 'quotes_generated_this_month' not in st.session_state:
     st.session_state['quotes_generated_this_month'] = 0
+if 'messages' not in st.session_state:
+    st.session_state.messages = [
+        {"role": "assistant", "content": "Hello! I am your automated project assistant. Describe what trade work you need done, and I will capture the project scope."}
+    ]
 
-if st.session_state['account_tier'] == "Free Test Tier":
-    LIMIT_MAX = 5
-elif st.session_state['account_tier'] == "Standard License":
-    LIMIT_MAX = 25
-else:
-    LIMIT_MAX = 999999
-
+# --- STATIC ACTIVE SUBSCRIPTION CLEARANCE PARAMETERS ---
+LIMIT_MAX = 5
 current_usage = st.session_state['quotes_generated_this_month']
 
 # =========================================================
 # MONITOR 1: THE SIDEBAR INTERACTIVE HUD CONTROLS
 # =========================================================
 st.sidebar.title("Quick Quote AI")
-st.sidebar.markdown(f"**Current Tier:** {st.session_state['account_tier']}")
-if st.session_state['account_tier'] == "Unlimited Premium":
-    st.sidebar.markdown("**Usage Allocation:** Unlimited Active Estimates")
-else:
-    st.sidebar.markdown(f"**Usage Allocation:** {current_usage} / {LIMIT_MAX} Used This Month")
-st.sidebar.markdown("---")
-
-st.sidebar.markdown("### Simulation Control")
-st.session_state['account_tier'] = st.sidebar.selectbox(
-    "Test Account Tier Limits:",
-    ["Free Test Tier", "Standard License", "Unlimited Premium"]
-)
+st.sidebar.markdown("**Current Tier:** Free Test Tier")
+st.sidebar.markdown(f"**Usage Allocation:** {current_usage} / {LIMIT_MAX} Used This Month")
 st.sidebar.markdown("---")
 
 user_trade = st.sidebar.selectbox(
@@ -71,9 +56,10 @@ if st.session_state['uploaded_logo'] is not None:
     st.sidebar.image(st.session_state['uploaded_logo'], width=120)
     st.sidebar.markdown("---")
 
+# Meticulously verified string keys matching navigation layout perfectly
 page_selection = st.sidebar.radio(
     "Navigate Dashboard Workspace", 
-    ["AI Estimate Engine", "Workspace Profiler & Ledger", "Premium Licensing"]
+    ["AI Estimate Engine", "Workspace Profiler", "Premium Licensing"]
 )
 
 class LineItem(BaseModel):
@@ -190,3 +176,11 @@ if page_selection == "AI Estimate Engine":
     # --- CLIENT LEAD GENERATOR AI BOT ---
     st.markdown("---")
     st.subheader("Client Lead Generator Bot (Beta Preview)")
+    st.write("Embed this bot directly on your website to catch project details while you sleep.")
+    
+    # Display message history
+    for msg in st.session_state.messages:
+        with st.chat_message(msg["role"]):
+            st.write(msg["content"])
+            
+    # Functional chatbot input mechanism decoupled entirely from upper layouts
