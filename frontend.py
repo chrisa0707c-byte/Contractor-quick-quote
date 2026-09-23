@@ -13,6 +13,58 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- 🎨 AUTOMATED ENTERPRISE DARK SKIN OVERRIDES ---
+st.markdown("""
+    <style>
+        .stApp {
+            background-color: #0b0f19 !important;
+            color: #ffffff !important;
+        }
+        h1, h2, h3, h4, p, label, .stMarkdown, [data-testid="stHeader"] {
+            color: #ffffff !important;
+        }
+        section[data-testid="stSidebar"] {
+            background-color: #0e1322 !important;
+        }
+        section[data-testid="stSidebar"] h1, 
+        section[data-testid="stSidebar"] h2, 
+        section[data-testid="stSidebar"] h3, 
+        section[data-testid="stSidebar"] p, 
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] span,
+        .stRadio label p {
+            color: #ffffff !important;
+        }
+        div[data-testid="stForm"], div[data-testid="stExpander"], .stAlert {
+            background-color: #111827 !important;
+            border: 1px solid #1f2937 !important;
+            border-radius: 8px !important;
+            padding: 2rem !important;
+        }
+        div[data-testid="stTextInput"] input, div[data-testid="stTextArea"] textarea, div[data-testid="stNumberInput"] input {
+            background-color: #1f2937 !important;
+            color: #ffffff !important;
+            border: 1px solid #4b5563 !important;
+            border-radius: 6px !important;
+        }
+        button, .stButton button, div[data-testid="stForm"] button {
+            background-color: #1f2937 !important;
+            color: #ffffff !important;
+            border: 2px solid #6366f1 !important;
+            border-radius: 6px !important;
+            font-weight: 600 !important;
+            padding: 0.5rem 1.5rem !important;
+        }
+        button:hover, .stButton button:hover {
+            background-color: #2563eb !important;
+            border-color: #3b82f6 !important;
+            color: #ffffff !important;
+        }
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+    </style>
+""", unsafe_allow_html=True)
+
 # --- INITIALIZE CORE LOCAL WORKSPACE SESSION STATES ---
 if 'quotes_history' not in st.session_state:
     st.session_state['quotes_history'] = []
@@ -45,6 +97,7 @@ if st.session_state['uploaded_logo'] is not None:
     st.sidebar.image(st.session_state['uploaded_logo'], width=120)
     st.sidebar.markdown("---")
 
+# Strings meticulously matched to ensure un-breakable workspace routing
 page_selection = st.sidebar.radio(
     "Navigate Dashboard Workspace", 
     ["AI Estimate Engine", "Workspace Profiler & Ledger", "Premium Licensing"]
@@ -153,36 +206,3 @@ if page_selection == "AI Estimate Engine":
         st.dataframe(mat_table, use_container_width=True)
             
         st.markdown("### Regional Labor Costs")
-        lab_table = [{"Operation": l.item_name, "Hours/Qty": l.quantity, "Unit": l.unit, "Rate/Unit": f"${l.estimated_cost_per_unit:.2f}", "Total": f"${l.total_item_cost:.2f}"} for l in data.labor_list]
-        st.dataframe(lab_table, use_container_width=True)
-
-# =========================================================
-# MONITOR 3: PAGE TAB 2 — THE PERSONAL WORKSPACE PROFILER
-# =========================================================
-elif page_selection == "Workspace Profiler & Ledger":
-    st.title("Advanced Contractor Workspace Profiler")
-    st.write("Customize your active crew specification parameters, upload company branding assets, and review history logs.")
-    st.markdown("---")
-    
-    col_prof1, col_prof2 = st.columns(2)
-    
-    with col_prof1:
-        st.markdown("### Crew Specifications")
-        with st.container(border=True):
-            st.session_state['base_labor_rate'] = st.number_input("Base Crew Labor Rate ($ / Hour)", min_value=10.0, max_value=500.0, value=st.session_state['base_labor_rate'], step=5.0)
-            st.session_state['company_markup'] = st.number_input("Company Profit Markup Margin (%)", min_value=0.0, max_value=200.0, value=st.session_state['company_markup'], step=2.5)
-        
-        st.markdown("### Corporate Identity Branding")
-        with st.container(border=True):
-            st.session_state['company_name'] = st.text_input("Business / Contracting Firm Name", value=st.session_state['company_name'])
-            uploaded_file = st.file_uploader("Upload Company Logo (PNG / JPG Profile)", type=["png", "jpg", "jpeg"])
-            if uploaded_file is not None:
-                st.session_state['uploaded_logo'] = uploaded_file.read()
-                st.success("Corporate Branding Asset Connected Successfully to Active Workspace!")
-            
-    with col_prof2:
-        st.markdown("### Session Project Ledger")
-        if not st.session_state['quotes_history']:
-            st.info("No active project quotes running inside this workspace session.")
-        else:
-            st.write("Running calculation log registry:")
