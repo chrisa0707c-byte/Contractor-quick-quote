@@ -13,16 +13,21 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 🎨 THE ULTIMATE HIGH-VISIBILITY FIXED DARK SKIN ---
+# --- 🎨 THE REPAIRED HIGH-VISIBILITY DESIGN SKIN OVERRIDES ---
 st.markdown("""
     <style>
-        .stApp {
+        /* Force core backdrop to a slick, deep midnight canvas slate */
+        .stApp, [data-testid="stAppViewContainer"] {
             background-color: #0b0f19 !important;
             color: #ffffff !important;
         }
+        
+        /* Enforce crisp white text readability across the entire platform layout */
         h1, h2, h3, h4, p, label, .stMarkdown, [data-testid="stHeader"] {
             color: #ffffff !important;
         }
+        
+        /* High-visibility adjustments for the sidebar pane */
         section[data-testid="stSidebar"] {
             background-color: #0e1322 !important;
         }
@@ -31,45 +36,46 @@ st.markdown("""
         section[data-testid="stSidebar"] h3, 
         section[data-testid="stSidebar"] p, 
         section[data-testid="stSidebar"] label,
-        section[data-testid="stSidebar"] div,
         section[data-testid="stSidebar"] span,
         .stRadio label p {
             color: #ffffff !important;
         }
-        div[data-testid="stForm"], div[data-testid="stExpander"], .stAlert {
+        
+        /* Turn container elements into dark glowing module cards */
+        div[data-testid="stForm"], div[data-testid="stExpander"], .stAlert, div[border="true"] {
             background-color: #111827 !important;
             border: 1px solid #1f2937 !important;
             border-radius: 8px !important;
-            padding: 2rem !important;
         }
+        
+        /* Turn input textboxes into dark slate gray framing elements */
         div[data-testid="stTextInput"] input, div[data-testid="stTextArea"] textarea, div[data-testid="stNumberInput"] input {
             background-color: #1f2937 !important;
             color: #ffffff !important;
             border: 1px solid #4b5563 !important;
             border-radius: 6px !important;
         }
+        
+        /* Keep all active calculation action buttons framed in electric indigo */
         button, .stButton button, div[data-testid="stForm"] button {
             background-color: #1f2937 !important;
             color: #ffffff !important;
             border: 2px solid #6366f1 !important;
             border-radius: 6px !important;
             font-weight: 600 !important;
-            padding: 0.5rem 1.5rem !important;
         }
         button:hover, .stButton button:hover {
             background-color: #2563eb !important;
             border-color: #3b82f6 !important;
             color: #ffffff !important;
         }
-        div[data-testid="stHorizontalBlock"] {
-            background-color: transparent !important;
-        }
+        
         footer {visibility: hidden;}
         header {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 
-# --- INITIALIZE CORE LOCAL VOLATILE STORAGE ---
+# --- INITIALIZE CORE LOCAL WORKSPACE SESSION CORES ---
 if 'quotes_history' not in st.session_state:
     st.session_state['quotes_history'] = []
 if 'base_labor_rate' not in st.session_state:
@@ -82,7 +88,7 @@ if 'company_name' not in st.session_state:
     st.session_state['company_name'] = ""
 
 # =========================================================
-# MONITOR 1: THE OPEN SIDEBAR CONSOLE CONTROLS
+# MONITOR 1: THE SIDEBAR INTERACTIVE HUD CONTROLS
 # =========================================================
 st.sidebar.title("Quick Quote AI")
 st.sidebar.markdown(f"**System Status:** `ACTIVE PUBLIC CONSOLE`")
@@ -118,7 +124,7 @@ class AIQuoteResponse(BaseModel):
     grand_total: float
 
 # =========================================================
-# MONITOR 2: THE CALCULATION SYSTEM MODULES
+# MONITOR 2: PAGE TAB 1 — THE CALCULATION MATRIX ENGINE
 # =========================================================
 if page_selection == "AI Estimate Engine":
     st.title("Quick Quote AI Estimation Console")
@@ -196,12 +202,9 @@ if page_selection == "AI Estimate Engine":
             st.subheader(f"Grand Total: ${data.grand_total:.2f}")
         st.write("")
         
-        # Fixed closed parenthesis map array bounds alignment parameters
         pdf_file = generate_pdf(data, st.session_state['p_type'], st.session_state['dims'], st.session_state['zip_c'], logo_image=st.session_state['uploaded_logo'], firm_name=st.session_state['company_name'])
         st.download_button(label="Download Estimate Profile as PDF", data=pdf_file, file_name=f"Estimate_{st.session_state['p_type'].replace(' ', '_')}.pdf", mime="application/pdf")
         
         st.write(f"**Justification:** {data.business_justification}")
         st.write(f"**Days to Complete:** {data.estimated_days_to_complete} business days")
         
-        st.markdown("### Materials Itemization")
-        mat_table = [{"Item Name": m.item_name, "Qty": m.quantity, "Unit": m.unit, "Cost/Unit": f"${m.estimated_cost_per_unit:.2f}", "Total": f"${m.total_item_cost:.2f}"} for m in data.materials_list]
