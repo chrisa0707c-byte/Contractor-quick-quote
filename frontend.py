@@ -4,7 +4,6 @@ from openai import OpenAI
 from pydantic import BaseModel
 from typing import List
 from pdf_builder import generate_pdf
-import requests
 
 # --- ENTERPRISE CONFIGURATION ---
 st.set_page_config(
@@ -57,99 +56,41 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- SECURE AUTOMATED PROGRAMMATIC BACKEND BRIDGE WIRES ---
-SUPABASE_URL = "https://supabase.co"
-SUPABASE_KEY = "sb_publishable_sJKogzgeJtD296ygXWd3rPExC2NlZTMzNmE0Y2M0YmFiNGM0NmY0YTllMDkyNDU1N2U3YTMxYzE4OGJhNGE5NDRlOGQyNTllNjc3ZDcyODRiZg=="
-
-# --- INITIALIZE CORE SECURITY AND ACCOUNT STATES ---
-if "user_authenticated" not in st.session_state:
-    st.session_state["user_authenticated"] = False
-if "user_email" not in st.session_state:
-    st.session_state["user_email"] = None
-if 'quotes_used' not in st.session_state:
-    st.session_state['quotes_used'] = 0
-
-FREE_LIMIT = 5
-remaining_quotes = FREE_LIMIT - st.session_state['quotes_used']
+# --- INITIALIZE CORE LOCAL VOLATILE STORAGE ---
+if 'quotes_history' not in st.session_state:
+    st.session_state['quotes_history'] = []
+if 'base_labor_rate' not in st.session_state:
+    st.session_state['base_labor_rate'] = 85.0
+if 'company_markup' not in st.session_state:
+    st.session_state['company_markup'] = 20.0
+if 'uploaded_logo' not in st.session_state:
+    st.session_state['uploaded_logo'] = None
+if 'company_name' not in st.session_state:
+    st.session_state['company_name'] = ""
 
 # =========================================================
-# MONITOR 0: THE ENTERPRISE GATEWAY (LOG IN / SIGN UP)
-# =========================================================
-if not st.session_state["user_authenticated"]:
-    st.title("Quick Quote AI - Enterprise Access Portal")
-    st.write("Secure multi-tenant workspace console. Authenticate your trade credentials to enter.")
-    st.markdown("---")
-    
-    auth_mode = st.radio("Select Portal Action", ["Sign In to Account", "Create New Workspace (Sign Up)"])
-    
-    with st.form("auth_form", clear_on_submit=False):
-        email = st.text_input("Corporate Email Address")
-        password = st.text_input("Secure Vault Password", type="password")
-        submit_auth = st.form_submit_button("Authenticate Credentials")
-        
-    if submit_auth:
-        if not email or not password:
-            st.error("Authentication Error: All fields are required.")
-        else:
-            headers = {
-                "apikey": SUPABASE_KEY,
-                "Authorization": f"Bearer {SUPABASE_KEY}",
-                "Content-Type": "application/json"
-            }
-            payload = {"email": email, "password": password}
-            
-            if auth_mode == "Create New Workspace (Sign Up)":
-                # Explicit routing to your personal project endpoint tunnel
-                endpoint = f"{SUPABASE_URL}/auth/v1/signup"
-                try:
-                    response = requests.post(endpoint, headers=headers, json=payload)
-                    res_data = response.json()
-                    if response.status_code == 200 or response.status_code == 201:
-                        st.success("🎉 Workspace Registered! Please check your email inbox to confirm your verification link, then toggle to Sign In.")
-                    else:
-                        st.error(f"Registration Failed: {res_data.get('msg', res_data.get('error_description', 'Invalid Request'))}")
-                except Exception as e:
-                    st.error(f"Network Error: {str(e)}")
-            else:
-                # Explicit routing to your personal project token generation portal
-                endpoint = f"{SUPABASE_URL}/auth/v1/token?grant_type=password"
-                try:
-                    response = requests.post(endpoint, headers=headers, json=payload)
-                    res_data = response.json()
-                    if response.status_code == 200:
-                        st.session_state["user_authenticated"] = True
-                        st.session_state["user_email"] = res_data["user"]["email"]
-                        st.success("Access Granted. Initializing console...")
-                        st.rerun()
-                    else:
-                        st.error(f"Access Denied: {res_data.get('error_description', res_data.get('msg', 'Invalid credentials'))}")
-                except Exception as e:
-                    st.error(f"Authentication Bridge Failed: {str(e)}")
-    st.stop()
-
-# =========================================================
-# MONITOR 1: THE ACTIVE AUTHORIZED WORKSPACE
+# MONITOR 1: THE OPEN SIDEBAR CONSOLE CONTROLS
 # =========================================================
 st.sidebar.title("Quick Quote AI")
-st.sidebar.markdown(f"**Account:** `{st.session_state['user_email']}`")
-st.sidebar.markdown(f"**System Status:** `PRO BETA`")
-st.sidebar.markdown(f"**Usage Allocation:** `{remaining_quotes} / {FREE_LIMIT} Remaining`")
+st.sidebar.markdown(f"**System Status:** `ACTIVE PUBLIC CONSOLE`")
 st.sidebar.markdown("---")
 
 user_trade = st.sidebar.selectbox(
-    "Select Your Field Trade Profile:",
+    "Select Field Trade Profile:",
     ["General Contractor", "Roofer / Siding Tech", "Professional Plumber", "Master Electrician", "Carpenter / Deck Builder"]
 )
-st.sidebar.success(f"Workspace optimized for: {user_trade}")
+st.sidebar.success(f"Console Calibrated to: {user_trade}")
 st.sidebar.markdown("---")
 
-page_selection = st.sidebar.radio("Navigate Enterprise Console", ["Platform Overview", "AI Estimate Engine", "Premium Licensing"])
+# Display thumbnail preview of corporate logo if uploaded inside the sidebar layout
+if st.session_state['uploaded_logo'] is not None:
+    st.sidebar.markdown("### Active Workspace Identity")
+    if st.session_state['company_name']:
+        st.sidebar.markdown(f"**Firm Name:** `{st.session_state['company_name']}`")
+    st.sidebar.image(st.session_state['uploaded_logo'], width=120)
+    st.sidebar.markdown("---")
 
-st.sidebar.markdown("---")
-if st.sidebar.button("🔒 Securely Log Out of Console"):
-    st.session_state["user_authenticated"] = False
-    st.session_state["user_email"] = None
-    st.rerun()
+page_selection = st.sidebar.radio("Navigate Dashboard Workspace", ["AI Estimate Engine", "Workspace Profiler & Ledger", "Premium Licensing"])
 
 class LineItem(BaseModel):
     item_name: str
@@ -165,58 +106,103 @@ class AIQuoteResponse(BaseModel):
     labor_list: List[LineItem]
     grand_total: float
 
-if page_selection == "Platform Overview":
-    st.title("Stop Losing Construction Deals to Slow Estimates")
-    st.subheader("Close residential clients directly from the driveway in under 30 seconds.")
-    st.write("")
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        with st.container(border=True):
-            st.markdown("### 30-Second Quotes")
-            st.write("Ditch evening paperwork. Type parameters right at the job site and let regional AI models construct cost itemizations instantly.")
-    with col2:
-        with st.container(border=True):
-            st.markdown("### Zero Speculation")
-            st.write("Build massive customer trust. Hand your client a transparent material and labor breakdown that removes price haggling completely.")
-    with col3:
-        with st.container(border=True):
-            st.markdown("### Instant PDF Delivery")
-            st.write("Generate professional proposals instantly. Click one button to compile and text or email a polished quote before your competitors leave the job site.")
-        
-    st.markdown("---")
-    
-    st.subheader("Client Lead Generator Bot (Beta Preview)")
-    st.write("Embed this bot directly on your website to catch project details while you sleep.")
-    
-    if "messages" not in st.session_state:
-        st.session_state.messages = [{"role": "assistant", "content": "Hello! I am your automated project assistant. Describe what trade work you need done, and I will capture the project scope."}]
-        
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            st.write(msg["content"])
-            
-    if bot_input := st.chat_input("Type your construction inquiry here..."):
-        st.session_state.messages.append({"role": "user", "content": bot_input})
-        with st.chat_message("user"):
-            st.write(bot_input)
-            
-        try:
-            client = OpenAI()
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "system", "content": "You are a customer assistant for a top contracting firm. Guide them smoothly to capture scope data."}, *st.session_state.messages]
-            )
-            reply = response.choices.message.content
-            st.session_state.messages.append({"role": "assistant", "content": reply})
-            with st.chat_message("assistant"):
-                st.write(reply)
-        except Exception as e:
-            st.error(f"Bot Offline: {str(e)}")
-
-elif page_selection == "AI Estimate Engine":
+# =========================================================
+# MONITOR 2: THE CALCULATION SYSTEM MODULES
+# =========================================================
+if page_selection == "AI Estimate Engine":
     st.title("Quick Quote AI Estimation Console")
-    st.write(f"Input your raw parameters below. Your console has been dynamically tailored to: {user_trade}.")
+    st.write(f"Input your raw parameters below to calculate instantaneous itemizations calibrated to: {user_trade}.")
     
-    if st.session_state['quotes_used'] >= FREE_LIMIT:
-        st.error("Free Beta Limit Reached!")
+    with st.form("quote_form"):
+        st.markdown(f"### Project Configuration Form — {user_trade}")
+        
+        dim_hint = "Project Parameters / Sizing Data"
+        mat_hint = "Paste your raw text layout parameters, labor tasks, or material counts here"
+        
+        if "Roofer" in user_trade:
+            dim_hint = "Project Size / Scope (e.g., 25 Squares, 2500 sq ft, 8/12 Pitch Angle)"
+            mat_hint = "Required Materials & Specifications (e.g., Timberline HDZ Shingles, Synthetic Underlayment, Ice & Water Shield)"
+        elif "Plumber" in user_trade:
+            dim_hint = "Project Size / Scope (e.g., 3-Bathroom Rough-In, 40 Linear Feet of Trenching)"
+            mat_hint = "Required Materials & Specifications (e.g., Schedule 40 PVC, Copper PEX Piping, Fixture counts and brands)"
+        elif "Electrician" in user_trade:
+            dim_hint = "Project Size / Scope (e.g., 200 Amp Service Upgrade, 2500 sq ft House Rewire)"
+            mat_hint = "Required Materials & Specifications (e.g., Romex 14/2 Wire, Siemens Panel Board, Outlet/Switch counts)"
+        elif "Carpenter" in user_trade:
+            dim_hint = "Project Size / Scope (e.g., 16x20 Floating Deck, 80 Linear Feet of Privacy Fencing)"
+            mat_hint = "Required Materials & Specifications (e.g., Pressure Treated Premium Lumber, Composite Decking boards)"
+
+        dimensions = st.text_input(dim_hint)
+        materials_requested = st.text_area(mat_hint, height=120)
+        zip_code = st.text_input("Job Zip Code / Region")
+        extra_notes = st.text_input("Extra Notes and Access Demands (Optional)")
+        submit = st.form_submit_button("Generate Professional Estimate Array")
+
+    if submit:
+        if not dimensions or not zip_code:
+            st.error("Please fill out Size and Zip Code.")
+        elif not os.environ.get("OPENAI_API_KEY"):
+            st.error("System Matrix Configuration Warning: API Key missing.")
+        else:
+            st.write("🔄 Activating Real-Time Price Indexing and calculating regional rates...")
+            client = OpenAI()
+            system_prompt = (
+                f"You are an expert construction estimator specialized exclusively in the field of: {user_trade}. "
+                f"The current year is 2026. Calculate material costs based on wholesale prices. "
+                f"Incorporate an operational baseline calculation assuming a standard crew labor cost index of ${st.session_state['base_labor_rate']}/hr "
+                f"and factor in an overall company structural project profit markup margin profile parameter of {st.session_state['company_markup']}%. "
+                f"Calibrate all line items to match localized market rates for zip code {zip_code}. Output highly accurate industry-standard itemized matrices."
+            )
+            user_prompt = f"Trade Context: {user_trade}\nMaterials/Specs: {materials_requested}\nScope/Dimensions: {dimensions}\nZip / Geographic Region: {zip_code}\nNotes: {extra_notes}"
+            
+            completion = client.beta.chat.completions.parse(
+                model="gpt-4o-mini",
+                messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
+                response_format=AIQuoteResponse,
+            )
+            parsed_response = completion.choices.message.parsed
+            st.session_state['data'] = parsed_response
+            st.session_state['p_type'] = user_trade
+            st.session_state['dims'] = dimensions
+            st.session_state['zip_c'] = zip_code
+            
+            st.session_state['quotes_history'].append({
+                "Trade": user_trade,
+                "Scope": dimensions,
+                "Zip": zip_code,
+                "Total": parsed_response.grand_total
+            })
+            st.rerun()
+
+    if 'data' in st.session_state:
+        data = st.session_state['data']
+        st.success("Estimate Complete and Appended to Local Session Workspace!")
+        
+        with st.container(border=True):
+            st.subheader(f"Grand Total: ${data.grand_total:.2f}")
+        st.write("")
+        
+        pdf_file = generate_pdf(
+            data, 
+            st.session_state['p_type'], 
+            st.session_state['dims'], 
+            st.session_state['zip_c'],
+            logo_image=st.session_state['uploaded_logo'],
+            firm_name=st.session_state['company_name']
+        )
+        st.download_button(label="Download Estimate Profile as PDF", data=pdf_file, file_name=f"Estimate_{st.session_state['p_type'].replace(' ', '_')}.pdf", mime="application/pdf")
+        
+        st.write(f"**Justification:** {data.business_justification}")
+        st.write(f"**Days to Complete:** {data.estimated_days_to_complete} business days")
+        
+        st.markdown("### Materials Itemization")
+        mat_table = [{"Item Name": m.item_name, "Qty": m.quantity, "Unit": m.unit, "Cost/Unit": f"${m.estimated_cost_per_unit:.2f}", "Total": f"${m.total_item_cost:.2f}"} for m in data.materials_list]
+        st.dataframe(mat_table, use_container_width=True)
+            
+        st.markdown("### Regional Labor Costs")
+        lab_table = [{"Operation": l.item_name, "Hours/Qty": l.quantity, "Unit": l.unit, "Rate/Unit": f"${l.estimated_cost_per_unit:.2f}", "Total": f"${l.total_item_cost:.2f}"} for l in data.labor_list]
+        st.dataframe(lab_table, use_container_width=True)
+
+# =========================================================
+# MONITOR 3: THE ADVANCED INDIVIDUAL SPECIFICATION PROFILER
+# =========================================================
