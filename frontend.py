@@ -16,18 +16,13 @@ st.set_page_config(
 # --- 🎨 THE ULTIMATE HIGH-VISIBILITY FIXED DARK SKIN ---
 st.markdown("""
     <style>
-        /* Force the core application background to a deep midnight charcoal slate */
         .stApp {
             background-color: #0b0f19 !important;
             color: #ffffff !important;
         }
-        
-        /* High-visibility adjustments for main body layout headers */
         h1, h2, h3, h4, p, label, .stMarkdown, [data-testid="stHeader"] {
             color: #ffffff !important;
         }
-        
-        /* Fix sidebar text so it is bright white and completely legible */
         section[data-testid="stSidebar"] {
             background-color: #0e1322 !important;
         }
@@ -41,24 +36,18 @@ st.markdown("""
         .stRadio label p {
             color: #ffffff !important;
         }
-
-        /* Style form container cards into glowing enterprise pods */
         div[data-testid="stForm"], div[data-testid="stExpander"], .stAlert {
             background-color: #111827 !important;
             border: 1px solid #1f2937 !important;
             border-radius: 8px !important;
             padding: 2rem !important;
         }
-        
-        /* Style internal text inputs with high-contrast text and border framing */
         div[data-testid="stTextInput"] input, div[data-testid="stTextArea"] textarea, div[data-testid="stNumberInput"] input {
             background-color: #1f2937 !important;
             color: #ffffff !important;
             border: 1px solid #4b5563 !important;
             border-radius: 6px !important;
         }
-        
-        /* Force form action buttons to remain fully visible with an indigo trim */
         button, .stButton button, div[data-testid="stForm"] button {
             background-color: #1f2937 !important;
             color: #ffffff !important;
@@ -72,12 +61,9 @@ st.markdown("""
             border-color: #3b82f6 !important;
             color: #ffffff !important;
         }
-        
-        /* Prevent Streamlit from blanking out data container frames */
         div[data-testid="stHorizontalBlock"] {
             background-color: transparent !important;
         }
-        
         footer {visibility: hidden;}
         header {visibility: hidden;}
     </style>
@@ -108,7 +94,6 @@ user_trade = st.sidebar.selectbox(
 )
 st.sidebar.markdown("---")
 
-# Display thumbnail preview of corporate logo if uploaded inside the sidebar layout
 if st.session_state['uploaded_logo'] is not None:
     st.sidebar.markdown("### Active Workspace Identity")
     if st.session_state['company_name']:
@@ -211,9 +196,12 @@ if page_selection == "AI Estimate Engine":
             st.subheader(f"Grand Total: ${data.grand_total:.2f}")
         st.write("")
         
-        pdf_file = generate_pdf(
-            data, 
-            st.session_state['p_type'], 
-            st.session_state['dims'], 
-            st.session_state['zip_c'],
-            logo_image=st.session_state['uploaded_logo'],
+        # Fixed closed parenthesis map array bounds alignment parameters
+        pdf_file = generate_pdf(data, st.session_state['p_type'], st.session_state['dims'], st.session_state['zip_c'], logo_image=st.session_state['uploaded_logo'], firm_name=st.session_state['company_name'])
+        st.download_button(label="Download Estimate Profile as PDF", data=pdf_file, file_name=f"Estimate_{st.session_state['p_type'].replace(' ', '_')}.pdf", mime="application/pdf")
+        
+        st.write(f"**Justification:** {data.business_justification}")
+        st.write(f"**Days to Complete:** {data.estimated_days_to_complete} business days")
+        
+        st.markdown("### Materials Itemization")
+        mat_table = [{"Item Name": m.item_name, "Qty": m.quantity, "Unit": m.unit, "Cost/Unit": f"${m.estimated_cost_per_unit:.2f}", "Total": f"${m.total_item_cost:.2f}"} for m in data.materials_list]
