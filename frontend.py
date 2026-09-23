@@ -45,6 +45,7 @@ if st.session_state['uploaded_logo'] is not None:
     st.sidebar.image(st.session_state['uploaded_logo'], width=120)
     st.sidebar.markdown("---")
 
+# Explicit array keys to perfectly map the three conditional page paths
 page_selection = st.sidebar.radio(
     "Navigate Dashboard Workspace", 
     ["AI Estimate Engine", "Workspace Profiler & Ledger", "Premium Licensing"]
@@ -185,4 +186,3 @@ elif page_selection == "Workspace Profiler & Ledger":
         if not st.session_state['quotes_history']:
             st.info("No active project quotes running inside this workspace session.")
         else:
-            st.write("Running calculation log registry:")
