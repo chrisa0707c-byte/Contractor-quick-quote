@@ -187,5 +187,6 @@ if page_selection == "AI Estimate Engine":
         lab_table = [{"Operation": l.item_name, "Hours/Qty": l.quantity, "Unit": l.unit, "Rate/Unit": f"${l.estimated_cost_per_unit:.2f}", "Total": f"${l.total_item_cost:.2f}"} for l in data.labor_list]
         st.dataframe(lab_table, use_container_width=True)
 
-# =========================================================
-# MONITOR 3: PAGE TAB 2 — THE PERSONAL WORKSPACE PROFILER
+    # --- CLIENT LEAD GENERATOR AI BOT ---
+    st.markdown("---")
+    st.subheader("Client Lead Generator Bot (Beta Preview)")
