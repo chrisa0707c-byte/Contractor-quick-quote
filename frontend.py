@@ -6,7 +6,6 @@ from typing import List
 from pdf_builder import generate_pdf
 
 # --- ENTERPRISE CONFIGURATION ---
-# Hardcoding a native platform configuration rule to enforce a permanent high-visibility dark canvas theme matrix
 st.set_page_config(
     page_title="Quick Quote AI - Premium Console", 
     page_icon="🏗️", 
@@ -186,3 +185,4 @@ elif page_selection == "Workspace Profiler & Ledger":
         if not st.session_state['quotes_history']:
             st.info("No active project quotes running inside this workspace session.")
         else:
+            st.write("Running calculation log registry:")
