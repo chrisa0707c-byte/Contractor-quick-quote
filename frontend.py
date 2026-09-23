@@ -29,7 +29,7 @@ if 'company_name' not in st.session_state:
 # MONITOR 1: THE SIDEBAR INTERACTIVE HUD CONTROLS
 # =========================================================
 st.sidebar.title("Quick Quote AI")
-st.sidebar.markdown(f"**System Status:** `ACTIVE PUBLIC CONSOLE`")
+st.sidebar.markdown("**System Status:** `ACTIVE PUBLIC CONSOLE`")
 st.sidebar.markdown("---")
 
 user_trade = st.sidebar.selectbox(
@@ -45,7 +45,6 @@ if st.session_state['uploaded_logo'] is not None:
     st.sidebar.image(st.session_state['uploaded_logo'], width=120)
     st.sidebar.markdown("---")
 
-# Official native radio routing matrix with zero dangerous HTML wrappers
 page_selection = st.sidebar.radio(
     "Navigate Dashboard Workspace", 
     ["AI Estimate Engine", "Workspace Profiler & Ledger", "Premium Licensing"]
@@ -142,7 +141,6 @@ if page_selection == "AI Estimate Engine":
         
         with st.container(border=True):
             st.subheader(f"Grand Total: ${data.grand_total:.2f}")
-        st.write("")
         
         pdf_file = generate_pdf(data, st.session_state['p_type'], st.session_state['dims'], st.session_state['zip_c'], logo_image=st.session_state['uploaded_logo'], firm_name=st.session_state['company_name'])
         st.download_button(label="Download Estimate Profile as PDF", data=pdf_file, file_name=f"Estimate_{st.session_state['p_type'].replace(' ', '_')}.pdf", mime="application/pdf")
@@ -174,7 +172,6 @@ elif page_selection == "Workspace Profiler & Ledger":
             st.session_state['base_labor_rate'] = st.number_input("Base Crew Labor Rate ($ / Hour)", min_value=10.0, max_value=500.0, value=st.session_state['base_labor_rate'], step=5.0)
             st.session_state['company_markup'] = st.number_input("Company Profit Markup Margin (%)", min_value=0.0, max_value=200.0, value=st.session_state['company_markup'], step=2.5)
         
-        st.write("")
         st.markdown("### 🏷️ Corporate Identity Branding")
         with st.container(border=True):
             st.session_state['company_name'] = st.text_input("Business / Contracting Firm Name", value=st.session_state['company_name'])
@@ -186,3 +183,6 @@ elif page_selection == "Workspace Profiler & Ledger":
     with col_prof2:
         st.markdown("### 🗄️ Session Project Ledger")
         if not st.session_state['quotes_history']:
+            st.info("No active project quotes running inside this workspace session.")
+        else:
+            st.write("Running calculation log registry:")
