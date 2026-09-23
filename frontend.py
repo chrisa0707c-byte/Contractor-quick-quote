@@ -26,35 +26,31 @@ if 'company_name' not in st.session_state:
     st.session_state['company_name'] = ""
 
 # --- ACTIVE SUBSCRIPTION TIER TRACKING ---
-# Default simulation layer allows testing limits instantly
 if 'account_tier' not in st.session_state:
     st.session_state['account_tier'] = "Free Test Tier"
 if 'quotes_generated_this_month' not in st.session_state:
     st.session_state['quotes_generated_this_month'] = 0
 
-# Set absolute operational volume locks based on active profile boundaries
 if st.session_state['account_tier'] == "Free Test Tier":
     LIMIT_MAX = 5
 elif st.session_state['account_tier'] == "Standard License":
     LIMIT_MAX = 25
 else:
-    LIMIT_MAX = 999999  # Unlimited tier index
+    LIMIT_MAX = 999999
 
 current_usage = st.session_state['quotes_generated_this_month']
-remaining_allowance = LIMIT_MAX - current_usage
 
 # =========================================================
 # MONITOR 1: THE SIDEBAR INTERACTIVE HUD CONTROLS
 # =========================================================
 st.sidebar.title("Quick Quote AI")
-st.sidebar.markdown(f"**Current Tier:** `{st.session_state['account_tier']}`")
+st.sidebar.markdown(f"**Current Tier:** {st.session_state['account_tier']}")
 if st.session_state['account_tier'] == "Unlimited Premium":
-    st.sidebar.markdown("**Usage Allocation:** `Unlimited Active Estimates`")
+    st.sidebar.markdown("**Usage Allocation:** Unlimited Active Estimates")
 else:
-    st.sidebar.markdown(f"**Usage Allocation:** `{current_usage} / {LIMIT_MAX} Used This Month`")
+    st.sidebar.markdown(f"**Usage Allocation:** {current_usage} / {LIMIT_MAX} Used This Month")
 st.sidebar.markdown("---")
 
-# Dynamic Admin Testing Console Switcher inside Sidebar HUD to immediately test calculations behavior
 st.sidebar.markdown("### Simulation Control")
 st.session_state['account_tier'] = st.sidebar.selectbox(
     "Test Account Tier Limits:",
@@ -71,7 +67,7 @@ st.sidebar.markdown("---")
 if st.session_state['uploaded_logo'] is not None:
     st.sidebar.markdown("### Active Workspace Identity")
     if st.session_state['company_name']:
-        st.sidebar.markdown(f"**Firm Name:** `{st.session_state['company_name']}`")
+        st.sidebar.markdown(f"**Firm Name:** {st.session_state['company_name']}")
     st.sidebar.image(st.session_state['uploaded_logo'], width=120)
     st.sidebar.markdown("---")
 
@@ -101,10 +97,9 @@ if page_selection == "AI Estimate Engine":
     st.title("Quick Quote AI Estimation Console")
     st.write(f"Input your raw parameters below to calculate instantaneous itemizations calibrated to: {user_trade}.")
     
-    # 🚨 STRICT HARD AUTOMATED USAGE WALL LOCKS 🚨
     if current_usage >= LIMIT_MAX:
         st.error(f"Monthly Tier Limit Reached: {current_usage} / {LIMIT_MAX} Estimates Consumed.")
-        st.warning(f"Your active subscription tier ({st.session_state['account_tier']}) has run out of estimates for this billing cycle. To open unlimited calculations and custom PDF proposal branding arrays instantly for your field crew, please advance to the Premium Licensing page selection tab to activate a higher plan clearance option.")
+        st.warning("Your active subscription tier has run out of estimates for this billing cycle. To open unlimited calculations and custom PDF proposal branding arrays instantly for your field crew, please advance to the Premium Licensing page selection tab to activate a higher plan clearance option.")
     else:
         with st.form("quote_form"):
             st.markdown(f"### Project Configuration Form — {user_trade}")
@@ -160,7 +155,6 @@ if page_selection == "AI Estimate Engine":
                     st.session_state['dims'] = dimensions
                     st.session_state['zip_c'] = zip_code
                     
-                    # Log data into session and increment the calculation volume meter metrics sequentially
                     st.session_state['quotes_generated_this_month'] += 1
                     st.session_state['quotes_history'].append({
                         "Trade": user_trade,
@@ -187,3 +181,11 @@ if page_selection == "AI Estimate Engine":
         
         st.markdown("### Materials Itemization")
         mat_table = [{"Item Name": m.item_name, "Qty": m.quantity, "Unit": m.unit, "Cost/Unit": f"${m.estimated_cost_per_unit:.2f}", "Total": f"${m.total_item_cost:.2f}"} for m in data.materials_list]
+        st.dataframe(mat_table, use_container_width=True)
+            
+        st.markdown("### Regional Labor Costs")
+        lab_table = [{"Operation": l.item_name, "Hours/Qty": l.quantity, "Unit": l.unit, "Rate/Unit": f"${l.estimated_cost_per_unit:.2f}", "Total": f"${l.total_item_cost:.2f}"} for l in data.labor_list]
+        st.dataframe(lab_table, use_container_width=True)
+
+# =========================================================
+# MONITOR 3: PAGE TAB 2 — THE PERSONAL WORKSPACE PROFILER
