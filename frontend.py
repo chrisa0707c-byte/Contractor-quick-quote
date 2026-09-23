@@ -13,29 +13,52 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 🎨 THE ULTIMATE HIGH-VISIBILITY MIDNIGHT SLATE OVERRIDES ---
+# --- 🎨 THE ULTIMATE HIGH-VISIBILITY FIXED DARK SKIN ---
 st.markdown("""
     <style>
+        /* Force the core application background to a deep midnight charcoal slate */
         .stApp {
             background-color: #0b0f19 !important;
-            color: #f3f4f6 !important;
-        }
-        h1, h2, h3, h4, p, label, .stMarkdown {
             color: #ffffff !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
         }
-        div[data-testid="stForm"] {
+        
+        /* High-visibility adjustments for main body layout headers */
+        h1, h2, h3, h4, p, label, .stMarkdown, [data-testid="stHeader"] {
+            color: #ffffff !important;
+        }
+        
+        /* Fix sidebar text so it is bright white and completely legible */
+        section[data-testid="stSidebar"] {
+            background-color: #0e1322 !important;
+        }
+        section[data-testid="stSidebar"] h1, 
+        section[data-testid="stSidebar"] h2, 
+        section[data-testid="stSidebar"] h3, 
+        section[data-testid="stSidebar"] p, 
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] div,
+        section[data-testid="stSidebar"] span,
+        .stRadio label p {
+            color: #ffffff !important;
+        }
+
+        /* Style form container cards into glowing enterprise pods */
+        div[data-testid="stForm"], div[data-testid="stExpander"], .stAlert {
             background-color: #111827 !important;
             border: 1px solid #1f2937 !important;
             border-radius: 8px !important;
             padding: 2rem !important;
         }
-        div[data-testid="stTextInput"] input, div[data-testid="stTextArea"] textarea {
+        
+        /* Style internal text inputs with high-contrast text and border framing */
+        div[data-testid="stTextInput"] input, div[data-testid="stTextArea"] textarea, div[data-testid="stNumberInput"] input {
             background-color: #1f2937 !important;
             color: #ffffff !important;
             border: 1px solid #4b5563 !important;
             border-radius: 6px !important;
         }
+        
+        /* Force form action buttons to remain fully visible with an indigo trim */
         button, .stButton button, div[data-testid="stForm"] button {
             background-color: #1f2937 !important;
             color: #ffffff !important;
@@ -43,14 +66,18 @@ st.markdown("""
             border-radius: 6px !important;
             font-weight: 600 !important;
             padding: 0.5rem 1.5rem !important;
-            visibility: visible !important;
-            opacity: 1 !important;
         }
         button:hover, .stButton button:hover {
             background-color: #2563eb !important;
             border-color: #3b82f6 !important;
             color: #ffffff !important;
         }
+        
+        /* Prevent Streamlit from blanking out data container frames */
+        div[data-testid="stHorizontalBlock"] {
+            background-color: transparent !important;
+        }
+        
         footer {visibility: hidden;}
         header {visibility: hidden;}
     </style>
@@ -79,7 +106,6 @@ user_trade = st.sidebar.selectbox(
     "Select Field Trade Profile:",
     ["General Contractor", "Roofer / Siding Tech", "Professional Plumber", "Master Electrician", "Carpenter / Deck Builder"]
 )
-st.sidebar.success(f"Console Calibrated to: {user_trade}")
 st.sidebar.markdown("---")
 
 # Display thumbnail preview of corporate logo if uploaded inside the sidebar layout
@@ -145,34 +171,37 @@ if page_selection == "AI Estimate Engine":
             st.error("System Matrix Configuration Warning: API Key missing.")
         else:
             st.write("🔄 Activating Real-Time Price Indexing and calculating regional rates...")
-            client = OpenAI()
-            system_prompt = (
-                f"You are an expert construction estimator specialized exclusively in the field of: {user_trade}. "
-                f"The current year is 2026. Calculate material costs based on wholesale prices. "
-                f"Incorporate an operational baseline calculation assuming a standard crew labor cost index of ${st.session_state['base_labor_rate']}/hr "
-                f"and factor in an overall company structural project profit markup margin profile parameter of {st.session_state['company_markup']}%. "
-                f"Calibrate all line items to match localized market rates for zip code {zip_code}. Output highly accurate industry-standard itemized matrices."
-            )
-            user_prompt = f"Trade Context: {user_trade}\nMaterials/Specs: {materials_requested}\nScope/Dimensions: {dimensions}\nZip / Geographic Region: {zip_code}\nNotes: {extra_notes}"
-            
-            completion = client.beta.chat.completions.parse(
-                model="gpt-4o-mini",
-                messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
-                response_format=AIQuoteResponse,
-            )
-            parsed_response = completion.choices.message.parsed
-            st.session_state['data'] = parsed_response
-            st.session_state['p_type'] = user_trade
-            st.session_state['dims'] = dimensions
-            st.session_state['zip_c'] = zip_code
-            
-            st.session_state['quotes_history'].append({
-                "Trade": user_trade,
-                "Scope": dimensions,
-                "Zip": zip_code,
-                "Total": parsed_response.grand_total
-            })
-            st.rerun()
+            try:
+                client = OpenAI()
+                system_prompt = (
+                    f"You are an expert construction estimator specialized exclusively in the field of: {user_trade}. "
+                    f"The current year is 2026. Calculate material costs based on wholesale prices. "
+                    f"Incorporate an operational baseline calculation assuming a standard crew labor cost index of ${st.session_state['base_labor_rate']}/hr "
+                    f"and factor in an overall company structural project profit markup margin profile parameter of {st.session_state['company_markup']}%. "
+                    f"Calibrate all line items to match localized market rates for zip code {zip_code}. Output highly accurate industry-standard itemized matrices."
+                )
+                user_prompt = f"Trade Context: {user_trade}\nMaterials/Specs: {materials_requested}\nScope/Dimensions: {dimensions}\nZip / Geographic Region: {zip_code}\nNotes: {extra_notes}"
+                
+                completion = client.beta.chat.completions.parse(
+                    model="gpt-4o-mini",
+                    messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
+                    response_format=AIQuoteResponse,
+                )
+                parsed_response = completion.choices.message.parsed
+                st.session_state['data'] = parsed_response
+                st.session_state['p_type'] = user_trade
+                st.session_state['dims'] = dimensions
+                st.session_state['zip_c'] = zip_code
+                
+                st.session_state['quotes_history'].append({
+                    "Trade": user_trade,
+                    "Scope": dimensions,
+                    "Zip": zip_code,
+                    "Total": parsed_response.grand_total
+                })
+                st.rerun()
+            except Exception as e:
+                st.error(f"Error compiling layout: {str(e)}")
 
     if 'data' in st.session_state:
         data = st.session_state['data']
@@ -188,21 +217,3 @@ if page_selection == "AI Estimate Engine":
             st.session_state['dims'], 
             st.session_state['zip_c'],
             logo_image=st.session_state['uploaded_logo'],
-            firm_name=st.session_state['company_name']
-        )
-        st.download_button(label="Download Estimate Profile as PDF", data=pdf_file, file_name=f"Estimate_{st.session_state['p_type'].replace(' ', '_')}.pdf", mime="application/pdf")
-        
-        st.write(f"**Justification:** {data.business_justification}")
-        st.write(f"**Days to Complete:** {data.estimated_days_to_complete} business days")
-        
-        st.markdown("### Materials Itemization")
-        mat_table = [{"Item Name": m.item_name, "Qty": m.quantity, "Unit": m.unit, "Cost/Unit": f"${m.estimated_cost_per_unit:.2f}", "Total": f"${m.total_item_cost:.2f}"} for m in data.materials_list]
-        st.dataframe(mat_table, use_container_width=True)
-            
-        st.markdown("### Regional Labor Costs")
-        lab_table = [{"Operation": l.item_name, "Hours/Qty": l.quantity, "Unit": l.unit, "Rate/Unit": f"${l.estimated_cost_per_unit:.2f}", "Total": f"${l.total_item_cost:.2f}"} for l in data.labor_list]
-        st.dataframe(lab_table, use_container_width=True)
-
-# =========================================================
-# MONITOR 3: THE ADVANCED INDIVIDUAL SPECIFICATION PROFILER
-# =========================================================
