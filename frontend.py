@@ -177,20 +177,20 @@ with tab2:
                 st.session_state['quotes_history'] = []
                 st.rerun()
 
-# --- TAB 3: CLEAN 2-TIER LICENSING CARDS ---
+# --- TAB 3: HIGHER-END TWO-TIER LICENSING CARDS ---
 with tab3:
     st.title("Secure Your Active Enterprise License")
     st.write("Unlock the absolute driveway sales weapon for your field operations crew.")
     st.markdown("---")
     
     st.subheader("Select Your Subscription Tier")
-    st.write("Click a plan card option below to launch Stripe's secure payment portal instantly.")
     st.write("")
     
     plan_col1, plan_col2 = st.columns(2)
     
     with plan_col1:
-        st.markdown("### 🥈 Standard Plan")
-        st.markdown("## **$30.00 / month**")
-        st.markdown("* **25 Automated Estimates** allowed per month")
-        st.markdown("* Uncapped professional custom PDF document downloads")
+        with st.container(border=True):
+            st.markdown("### Standard Plan")
+            st.markdown("## **$30.00 / month**")
+            st.markdown("- **25 Automated Estimates** per month")
+            st.markdown("- Uncapped professional custom PDF document downloads")
