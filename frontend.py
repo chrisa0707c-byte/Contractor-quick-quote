@@ -4,7 +4,7 @@ from openai import OpenAI
 from pydantic import BaseModel
 from typing import List
 from pdf_builder import generate_pdf
-from supabase import create_client, Client
+import requests
 
 # --- ENTERPRISE CONFIGURATION ---
 st.set_page_config(
@@ -57,17 +57,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- SECURE SUPABASE CLOUD DATABASE WIRES ---
+# --- SECURE AUTOMATED PROGRAMMATIC BACKEND BRIDGE WIRES ---
 SUPABASE_URL = "https://supabase.co"
 SUPABASE_KEY = "sb_publishable_sJKogzgeJtD296ygXWd3rPExC2NlZTMzNmE0Y2M0YmFiNGM0NmY0YTllMDkyNDU1N2U3YTMxYzE4OGJhNGE5NDRlOGQyNTllNjc3ZDcyODRiZg=="
-
-@st.cache_resource
-def init_supabase():
-    if SUPABASE_URL and SUPABASE_KEY:
-        return create_client(SUPABASE_URL, SUPABASE_KEY)
-    return None
-
-supabase: Client = init_supabase()
 
 # --- INITIALIZE CORE SECURITY AND ACCOUNT STATES ---
 if "user_authenticated" not in st.session_state:
@@ -98,25 +90,41 @@ if not st.session_state["user_authenticated"]:
     if submit_auth:
         if not email or not password:
             st.error("Authentication Error: All fields are required.")
-        elif not supabase:
-            st.error("Database Connection Offline.")
         else:
+            headers = {
+                "apikey": SUPABASE_KEY,
+                "Authorization": f"Bearer {SUPABASE_KEY}",
+                "Content-Type": "application/json"
+            }
+            payload = {"email": email, "password": password}
+            
             if auth_mode == "Create New Workspace (Sign Up)":
+                # Explicit routing to your personal project endpoint tunnel
+                endpoint = f"{SUPABASE_URL}/auth/v1/signup"
                 try:
-                    res = supabase.auth.sign_up({"email": email, "password": password})
-                    st.success("🎉 Workspace Registered! Please check your email inbox to confirm your verification link, then toggle to Sign In.")
+                    response = requests.post(endpoint, headers=headers, json=payload)
+                    res_data = response.json()
+                    if response.status_code == 200 or response.status_code == 201:
+                        st.success("🎉 Workspace Registered! Please check your email inbox to confirm your verification link, then toggle to Sign In.")
+                    else:
+                        st.error(f"Registration Failed: {res_data.get('msg', res_data.get('error_description', 'Invalid Request'))}")
                 except Exception as e:
-                    st.error(f"Registration Failed: {str(e)}")
+                    st.error(f"Network Error: {str(e)}")
             else:
+                # Explicit routing to your personal project token generation portal
+                endpoint = f"{SUPABASE_URL}/auth/v1/token?grant_type=password"
                 try:
-                    res = supabase.auth.sign_in_with_password({"email": email, "password": password})
-                    if res and res.user:
+                    response = requests.post(endpoint, headers=headers, json=payload)
+                    res_data = response.json()
+                    if response.status_code == 200:
                         st.session_state["user_authenticated"] = True
-                        st.session_state["user_email"] = res.user.email
+                        st.session_state["user_email"] = res_data["user"]["email"]
                         st.success("Access Granted. Initializing console...")
                         st.rerun()
+                    else:
+                        st.error(f"Access Denied: {res_data.get('error_description', res_data.get('msg', 'Invalid credentials'))}")
                 except Exception as e:
-                    st.error(f"Access Denied: Invalid credentials. ({str(e)})")
+                    st.error(f"Authentication Bridge Failed: {str(e)}")
     st.stop()
 
 # =========================================================
@@ -212,13 +220,3 @@ elif page_selection == "AI Estimate Engine":
     
     if st.session_state['quotes_used'] >= FREE_LIMIT:
         st.error("Free Beta Limit Reached!")
-        st.warning("You have successfully generated your 5 free project estimates. To unlock unlimited calculations and custom PDF proposal downloads for your field crew, please activate a license under Premium Licensing.")
-    else:
-        dim_hint = "Project Parameters / Sizing Data"
-        mat_hint = "Paste your raw text layout parameters, labor tasks, or material counts here"
-        
-        if "Roofer" in user_trade:
-            dim_hint = "Project Size / Scope (e.g., 25 Squares, 2500 sq ft, 8/12 Pitch Angle)"
-            mat_hint = "Required Materials & Specifications (e.g., Timberline HDZ Shingles, Synthetic Underlayment, Ice & Water Shield)"
-        elif "Plumber" in user_trade:
-            dim_hint = "Project Size / Scope (e.g., 3-Bathroom Rough-In, 40 Linear Feet of Trenching)"
