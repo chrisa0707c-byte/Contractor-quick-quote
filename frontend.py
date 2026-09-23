@@ -52,11 +52,9 @@ if st.session_state['uploaded_logo'] is not None:
     st.sidebar.image(st.session_state['uploaded_logo'], width=120)
     st.sidebar.markdown("---")
 
-# Using numerical indices behind the scenes to completely shatter Streamlit browser caching blocks
-page_index = st.sidebar.radio(
-    "Navigate Dashboard Workspace",
-    ["AI Estimate Engine", "Workspace Profiler", "Premium Licensing"],
-    index=0
+page_selection = st.sidebar.radio(
+    "Navigate Dashboard Workspace", 
+    ["AI Estimate Engine", "Workspace Profiler", "Premium Licensing"]
 )
 
 class LineItem(BaseModel):
@@ -76,7 +74,7 @@ class AIQuoteResponse(BaseModel):
 # =========================================================
 # MONITOR 2: PAGE TAB 1 — THE CALCULATION MATRIX ENGINE
 # =========================================================
-if page_index == "AI Estimate Engine":
+if page_selection == "AI Estimate Engine":
     st.title("Quick Quote AI Estimation Console")
     st.write(f"Input your raw parameters below to calculate instantaneous itemizations calibrated to: {user_trade}.")
     
@@ -86,7 +84,7 @@ if page_index == "AI Estimate Engine":
     else:
         with st.form("quote_form"):
             st.markdown(f"### Project Configuration Form — {user_trade}")
-            dimensions = st.text_input("Project Sizing Data / Parameters")
+            dimensions = st.text_input("Project Sizing Data / Parameters (e.g., 25 Squares, 2500 sq ft)")
             materials_requested = st.text_area("Required Materials and Specifications", height=120)
             zip_code = st.text_input("Job Zip Code / Region")
             extra_notes = st.text_input("Extra Notes and Access Demands (Optional)")
@@ -185,3 +183,6 @@ elif page_selection == "Workspace Profiler":
             st.write("Running calculation log registry:")
             st.dataframe(st.session_state['quotes_history'], use_container_width=True)
             if st.button("Clear Local Session Ledger"):
+                st.session_state['quotes_history'] = []
+                st.rerun()
+
