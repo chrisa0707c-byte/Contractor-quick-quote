@@ -32,7 +32,7 @@ LIMIT_MAX = 5
 current_usage = st.session_state['quotes_generated_this_month']
 
 # =========================================================
-# MONITOR 1: THE SIDEBAR INTERACTIVE HUD CONTROLS
+# MONITOR 1: THE SIDEBAR WORKSPACE IDENTITY HUD
 # =========================================================
 st.sidebar.title("Quick Quote AI")
 st.sidebar.markdown("**System Status:** ACTIVE PUBLIC CONSOLE")
@@ -52,11 +52,6 @@ if st.session_state['uploaded_logo'] is not None:
     st.sidebar.image(st.session_state['uploaded_logo'], width=120)
     st.sidebar.markdown("---")
 
-page_selection = st.sidebar.radio(
-    "Navigate Dashboard Workspace", 
-    ["AI Estimate Engine", "Workspace Profiler", "Premium Licensing"]
-)
-
 class LineItem(BaseModel):
     item_name: str
     quantity: float
@@ -72,15 +67,18 @@ class AIQuoteResponse(BaseModel):
     grand_total: float
 
 # =========================================================
-# MONITOR 2: PAGE TAB 1 — THE CALCULATION MATRIX ENGINE
+# MONITOR 2: NATIVE TOP TAB APP MOUNT MATRIX
 # =========================================================
-if page_selection == "AI Estimate Engine":
+tab1, tab2, tab3 = st.tabs(["AI Estimate Engine", "Workspace Profiler & Ledger", "Premium Licensing"])
+
+# --- TAB 1: CALCULATION MATRIX ENGINE ---
+with tab1:
     st.title("Quick Quote AI Estimation Console")
     st.write(f"Input your raw parameters below to calculate instantaneous itemizations calibrated to: {user_trade}.")
     
     if current_usage >= LIMIT_MAX:
         st.error(f"Monthly Tier Limit Reached: {current_usage} / {LIMIT_MAX} Estimates Consumed.")
-        st.warning("Your active subscription tier has run out of estimates for this billing cycle. To open unlimited calculations and custom PDF proposal branding arrays instantly for your field crew, please advance to the Premium Licensing page selection tab to activate a higher plan clearance option.")
+        st.warning("Your active subscription tier has run out of estimates. Please jump over to the Premium Licensing tab to upgrade your workspace volume allowance instantly.")
     else:
         with st.form("quote_form"):
             st.markdown(f"### Project Configuration Form — {user_trade}")
@@ -151,16 +149,13 @@ if page_selection == "AI Estimate Engine":
         lab_table = [{"Operation": l.item_name, "Hours/Qty": l.quantity, "Unit": l.unit, "Rate/Unit": f"${l.estimated_cost_per_unit:.2f}", "Total": f"${l.total_item_cost:.2f}"} for l in data.labor_list]
         st.dataframe(lab_table, use_container_width=True)
 
-# =========================================================
-# MONITOR 3: PAGE TAB 2 — THE PERSONAL WORKSPACE PROFILER
-# =========================================================
-elif page_selection == "Workspace Profiler":
+# --- TAB 2: PERSONAL WORKSPACE PROFILER ---
+with tab2:
     st.title("Advanced Contractor Workspace Profiler")
     st.write("Customize your active crew specification parameters, upload company branding assets, and review history logs.")
     st.markdown("---")
     
     col_prof1, col_prof2 = st.columns(2)
-    
     with col_prof1:
         st.markdown("### Crew Specifications")
         with st.container(border=True):
@@ -186,3 +181,12 @@ elif page_selection == "Workspace Profiler":
                 st.session_state['quotes_history'] = []
                 st.rerun()
 
+# --- TAB 3: PREMIUM LICENSING HUB ---
+with tab3:
+    st.title("Secure Your Active Enterprise License")
+    st.write("Unlock the absolute driveway sales weapon for your field operations crew.")
+    st.markdown("---")
+    
+    tier1, tier2, tier3 = st.columns(3)
+    with tier1:
+        with st.container(border=True):
