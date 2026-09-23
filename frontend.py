@@ -32,11 +32,11 @@ LIMIT_MAX = 5
 current_usage = st.session_state['quotes_generated_this_month']
 
 # =========================================================
-# MONITOR 1: THE SIDEBAR WORKSPACE IDENTITY HUD
+# SIDEBAR NAVIGATION
 # =========================================================
 st.sidebar.title("Quick Quote AI")
 st.sidebar.markdown("**System Status:** ACTIVE PUBLIC CONSOLE")
-st.sidebar.markdown(f"**Usage Allocation:** {current_usage} / {LIMIT_MAX} Used This Month")
+st.sidebar.markdown(f"**Usage Allocation:** {current_usage} / {LIMIT_MAX} Used")
 st.sidebar.markdown("---")
 
 user_trade = st.sidebar.selectbox(
@@ -67,18 +67,18 @@ class AIQuoteResponse(BaseModel):
     grand_total: float
 
 # =========================================================
-# MONITOR 2: NATIVE TOP TAB APP MOUNT MATRIX
+# APPLICATION MAIN TABS
 # =========================================================
 tab1, tab2, tab3 = st.tabs(["AI Estimate Engine", "Workspace Profiler & Ledger", "Premium Licensing"])
 
-# --- TAB 1: CALCULATION MATRIX ENGINE ---
+# --- TAB 1: ESTIMATE ENGINE ---
 with tab1:
     st.title("Quick Quote AI Estimation Console")
-    st.write(f"Input your raw parameters below to calculate instantaneous itemizations calibrated to: {user_trade}.")
+    st.write(f"Input parameters below to calculate rates calibrated to: {user_trade}.")
     
     if current_usage >= LIMIT_MAX:
         st.error(f"Monthly Tier Limit Reached: {current_usage} / {LIMIT_MAX} Estimates Consumed.")
-        st.warning("Your active subscription tier has run out of estimates. Please jump over to the Premium Licensing tab to upgrade your workspace volume allowance instantly.")
+        st.warning("Your active tier has run out of estimates. Please jump to the Premium Licensing tab to upgrade instantly.")
     else:
         with st.form("quote_form"):
             st.markdown(f"### Project Configuration Form — {user_trade}")
@@ -147,10 +147,10 @@ with tab1:
         lab_table = [{"Operation": l.item_name, "Hours/Qty": l.quantity, "Unit": l.unit, "Rate/Unit": f"${l.estimated_cost_per_unit:.2f}", "Total": f"${l.total_item_cost:.2f}"} for l in data.labor_list]
         st.dataframe(lab_table, use_container_width=True)
 
-# --- TAB 2: PERSONAL WORKSPACE PROFILER ---
+# --- TAB 2: WORKSPACE PROFILER ---
 with tab2:
     st.title("Advanced Contractor Workspace Profiler")
-    st.write("Customize your active crew specification parameters, upload company branding assets, and review history logs.")
+    st.write("Customize active specification parameters, upload branding assets, and review history logs.")
     st.markdown("---")
     
     col_p1, col_p2 = st.columns(2)
@@ -164,7 +164,7 @@ with tab2:
         uploaded_file = st.file_uploader("Upload Company Logo (PNG / JPG Profile)", type=["png", "jpg", "jpeg"])
         if uploaded_file is not None:
             st.session_state['uploaded_logo'] = uploaded_file.read()
-            st.success("Corporate Branding Asset Connected Successfully to Active Workspace!")
+            st.success("Corporate Branding Asset Connected Successfully!")
             
     with col_p2:
         st.markdown("### Session Project Ledger")
@@ -177,15 +177,21 @@ with tab2:
                 st.session_state['quotes_history'] = []
                 st.rerun()
 
-# --- TAB 3: PREMIUM LICENSING HUB (FIXED CLICKABLE INTERFACE) ---
+# --- TAB 3: CLEAN 2-TIER LICENSING CARDS ---
 with tab3:
     st.title("Secure Your Active Enterprise License")
     st.write("Unlock the absolute driveway sales weapon for your field operations crew.")
     st.markdown("---")
     
-    st.subheader("Choose Your Plan Tier")
-    st.write("Click any plan option to open Stripe's encrypted payment gateway directly.")
+    st.subheader("Select Your Subscription Tier")
+    st.write("Click a plan card option below to launch Stripe's secure payment portal instantly.")
     st.write("")
     
-    # Flat layout framework utilizing clean bulletproof functional buttons
-    st.markdown("### 1. Free Test Tier")
+    # Render exactly two columns side-by-side for maximum visual cleanliness
+    plan_col1, plan_col2 = st.columns(2)
+    
+    with plan_col1:
+        st.markdown("### 🥈 Standard Plan")
+        st.write("## **$30.00 / month**")
+        st.markdown("""
+        * **25 Automated Estimates** allowed per month
