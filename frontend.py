@@ -132,8 +132,7 @@ with tab1:
         data = st.session_state['data']
         st.success("Estimate Complete and Appended to Local Session Workspace!")
         
-        with st.container(border=True):
-            st.subheader(f"Grand Total: ${data.grand_total:.2f}")
+        st.markdown(f"### Grand Total: ${data.grand_total:.2f}")
         
         pdf_file = generate_pdf(data, st.session_state['p_type'], st.session_state['dims'], st.session_state['zip_c'], logo_image=st.session_state['uploaded_logo'], firm_name=st.session_state['company_name'])
         st.download_button(label="Download Estimate Profile as PDF", data=pdf_file, file_name=f"Estimate_{st.session_state['p_type'].replace(' ', '_')}.pdf", mime="application/pdf")
@@ -158,17 +157,15 @@ with tab2:
     col_prof1, col_prof2 = st.columns(2)
     with col_prof1:
         st.markdown("### Crew Specifications")
-        with st.container(border=True):
-            st.session_state['base_labor_rate'] = st.number_input("Base Crew Labor Rate ($ / Hour)", min_value=10.0, max_value=500.0, value=st.session_state['base_labor_rate'], step=5.0)
-            st.session_state['company_markup'] = st.number_input("Company Profit Markup Margin (%)", min_value=0.0, max_value=200.0, value=st.session_state['company_markup'], step=2.5)
+        st.session_state['base_labor_rate'] = st.number_input("Base Crew Labor Rate ($ / Hour)", min_value=10.0, max_value=500.0, value=st.session_state['base_labor_rate'], step=5.0)
+        st.session_state['company_markup'] = st.number_input("Company Profit Markup Margin (%)", min_value=0.0, max_value=200.0, value=st.session_state['company_markup'], step=2.5)
         
         st.markdown("### Corporate Identity Branding")
-        with st.container(border=True):
-            st.session_state['company_name'] = st.text_input("Business / Contracting Firm Name", value=st.session_state['company_name'])
-            uploaded_file = st.file_uploader("Upload Company Logo (PNG / JPG Profile)", type=["png", "jpg", "jpeg"])
-            if uploaded_file is not None:
-                st.session_state['uploaded_logo'] = uploaded_file.read()
-                st.success("Corporate Branding Asset Connected Successfully to Active Workspace!")
+        st.session_state['company_name'] = st.text_input("Business / Contracting Firm Name", value=st.session_state['company_name'])
+        uploaded_file = st.file_uploader("Upload Company Logo (PNG / JPG Profile)", type=["png", "jpg", "jpeg"])
+        if uploaded_file is not None:
+            st.session_state['uploaded_logo'] = uploaded_file.read()
+            st.success("Corporate Branding Asset Connected Successfully to Active Workspace!")
             
     with col_prof2:
         st.markdown("### Session Project Ledger")
@@ -181,12 +178,14 @@ with tab2:
                 st.session_state['quotes_history'] = []
                 st.rerun()
 
-# --- TAB 3: PREMIUM LICENSING HUB ---
+# --- TAB 3: PREMIUM LICENSING HUB (FLATTENED EXTRA-SAFE FORMAT) ---
 with tab3:
     st.title("Secure Your Active Enterprise License")
     st.write("Unlock the absolute driveway sales weapon for your field operations crew.")
     st.markdown("---")
     
-    tier1, tier2, tier3 = st.columns(3)
-    with tier1:
-        with st.container(border=True):
+    st.markdown("### Choose Your Plan Tier")
+    
+    st.markdown("#### 1. Free Test Tier — $0.00 / mo")
+    st.write("Inclusions: 5 Total Estimates Max | On-Screen Calculator Grid | Parameter Saves")
+    st.write("Status: Active Profile Option")
