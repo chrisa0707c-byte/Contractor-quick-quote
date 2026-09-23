@@ -187,11 +187,10 @@ with tab3:
     st.write("Click a plan card option below to launch Stripe's secure payment portal instantly.")
     st.write("")
     
-    # Render exactly two columns side-by-side for maximum visual cleanliness
     plan_col1, plan_col2 = st.columns(2)
     
     with plan_col1:
         st.markdown("### 🥈 Standard Plan")
-        st.write("## **$30.00 / month**")
-        st.markdown("""
-        * **25 Automated Estimates** allowed per month
+        st.markdown("## **$30.00 / month**")
+        st.markdown("* **25 Automated Estimates** allowed per month")
+        st.markdown("* Uncapped professional custom PDF document downloads")
