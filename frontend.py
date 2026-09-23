@@ -4,6 +4,7 @@ from openai import OpenAI
 from pydantic import BaseModel
 from typing import List
 from pdf_builder import generate_pdf
+import requests
 
 # --- ENTERPRISE CONFIGURATION ---
 st.set_page_config(
@@ -26,12 +27,7 @@ if 'company_name' not in st.session_state:
     st.session_state['company_name'] = ""
 if 'quotes_generated_this_month' not in st.session_state:
     st.session_state['quotes_generated_this_month'] = 0
-if 'messages' not in st.session_state:
-    st.session_state.messages = [
-        {"role": "assistant", "content": "Hello! I am your automated project assistant. Describe what trade work you need done, and I will capture the project scope."}
-    ]
 
-# --- STATIC ACTIVE SUBSCRIPTION CLEARANCE PARAMETERS ---
 LIMIT_MAX = 5
 current_usage = st.session_state['quotes_generated_this_month']
 
@@ -56,10 +52,11 @@ if st.session_state['uploaded_logo'] is not None:
     st.sidebar.image(st.session_state['uploaded_logo'], width=120)
     st.sidebar.markdown("---")
 
-# Meticulously verified string keys matching navigation layout perfectly
-page_selection = st.sidebar.radio(
-    "Navigate Dashboard Workspace", 
-    ["AI Estimate Engine", "Workspace Profiler", "Premium Licensing"]
+# Using numerical indices behind the scenes to completely shatter Streamlit browser caching blocks
+page_index = st.sidebar.radio(
+    "Navigate Dashboard Workspace",
+    ["AI Estimate Engine", "Workspace Profiler", "Premium Licensing"],
+    index=0
 )
 
 class LineItem(BaseModel):
@@ -79,7 +76,7 @@ class AIQuoteResponse(BaseModel):
 # =========================================================
 # MONITOR 2: PAGE TAB 1 — THE CALCULATION MATRIX ENGINE
 # =========================================================
-if page_selection == "AI Estimate Engine":
+if page_index == "AI Estimate Engine":
     st.title("Quick Quote AI Estimation Console")
     st.write(f"Input your raw parameters below to calculate instantaneous itemizations calibrated to: {user_trade}.")
     
@@ -89,25 +86,8 @@ if page_selection == "AI Estimate Engine":
     else:
         with st.form("quote_form"):
             st.markdown(f"### Project Configuration Form — {user_trade}")
-            
-            dim_hint = "Project Parameters / Sizing Data"
-            mat_hint = "Paste your raw text layout parameters, labor tasks, or material counts here"
-            
-            if "Roofer" in user_trade:
-                dim_hint = "Project Size / Scope (e.g., 25 Squares, 2500 sq ft, 8/12 Pitch Angle)"
-                mat_hint = "Required Materials & Specifications (e.g., Timberline HDZ Shingles, Synthetic Underlayment, Ice & Water Shield)"
-            elif "Plumber" in user_trade:
-                dim_hint = "Project Size / Scope (e.g., 3-Bathroom Rough-In, 40 Linear Feet of Trenching)"
-                mat_hint = "Required Materials & Specifications (e.g., Schedule 40 PVC, Copper PEX Piping, Fixture counts and brands)"
-            elif "Electrician" in user_trade:
-                dim_hint = "Project Size / Scope (e.g., 200 Amp Service Upgrade, 2500 sq ft House Rewire)"
-                mat_hint = "Required Materials & Specifications (e.g., Romex 14/2 Wire, Siemens Panel Board, Outlet/Switch counts)"
-            elif "Carpenter" in user_trade:
-                dim_hint = "Project Size / Scope (e.g., 16x20 Floating Deck, 80 Linear Feet of Privacy Fencing)"
-                mat_hint = "Required Materials & Specifications (e.g., Pressure Treated Premium Lumber, Composite Decking boards)"
-
-            dimensions = st.text_input(dim_hint)
-            materials_requested = st.text_area(mat_hint, height=120)
+            dimensions = st.text_input("Project Sizing Data / Parameters")
+            materials_requested = st.text_area("Required Materials and Specifications", height=120)
             zip_code = st.text_input("Job Zip Code / Region")
             extra_notes = st.text_input("Extra Notes and Access Demands (Optional)")
             submit = st.form_submit_button("Generate Professional Estimate Array")
@@ -173,14 +153,35 @@ if page_selection == "AI Estimate Engine":
         lab_table = [{"Operation": l.item_name, "Hours/Qty": l.quantity, "Unit": l.unit, "Rate/Unit": f"${l.estimated_cost_per_unit:.2f}", "Total": f"${l.total_item_cost:.2f}"} for l in data.labor_list]
         st.dataframe(lab_table, use_container_width=True)
 
-    # --- CLIENT LEAD GENERATOR AI BOT ---
+# =========================================================
+# MONITOR 3: PAGE TAB 2 — THE PERSONAL WORKSPACE PROFILER
+# =========================================================
+elif page_selection == "Workspace Profiler":
+    st.title("Advanced Contractor Workspace Profiler")
+    st.write("Customize your active crew specification parameters, upload company branding assets, and review history logs.")
     st.markdown("---")
-    st.subheader("Client Lead Generator Bot (Beta Preview)")
-    st.write("Embed this bot directly on your website to catch project details while you sleep.")
     
-    # Display message history
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            st.write(msg["content"])
+    col_prof1, col_prof2 = st.columns(2)
+    
+    with col_prof1:
+        st.markdown("### Crew Specifications")
+        with st.container(border=True):
+            st.session_state['base_labor_rate'] = st.number_input("Base Crew Labor Rate ($ / Hour)", min_value=10.0, max_value=500.0, value=st.session_state['base_labor_rate'], step=5.0)
+            st.session_state['company_markup'] = st.number_input("Company Profit Markup Margin (%)", min_value=0.0, max_value=200.0, value=st.session_state['company_markup'], step=2.5)
+        
+        st.markdown("### Corporate Identity Branding")
+        with st.container(border=True):
+            st.session_state['company_name'] = st.text_input("Business / Contracting Firm Name", value=st.session_state['company_name'])
+            uploaded_file = st.file_uploader("Upload Company Logo (PNG / JPG Profile)", type=["png", "jpg", "jpeg"])
+            if uploaded_file is not None:
+                st.session_state['uploaded_logo'] = uploaded_file.read()
+                st.success("Corporate Branding Asset Connected Successfully to Active Workspace!")
             
-    # Functional chatbot input mechanism decoupled entirely from upper layouts
+    with col_prof2:
+        st.markdown("### Session Project Ledger")
+        if not st.session_state['quotes_history']:
+            st.info("No active project quotes running inside this workspace session.")
+        else:
+            st.write("Running calculation log registry:")
+            st.dataframe(st.session_state['quotes_history'], use_container_width=True)
+            if st.button("Clear Local Session Ledger"):
