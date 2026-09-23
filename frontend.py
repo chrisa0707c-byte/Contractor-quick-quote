@@ -6,6 +6,7 @@ from typing import List
 from pdf_builder import generate_pdf
 
 # --- ENTERPRISE CONFIGURATION ---
+# Hardcoding a native platform configuration rule to enforce a permanent high-visibility dark canvas theme matrix
 st.set_page_config(
     page_title="Quick Quote AI - Premium Console", 
     page_icon="🏗️", 
@@ -29,7 +30,7 @@ if 'company_name' not in st.session_state:
 # MONITOR 1: THE SIDEBAR INTERACTIVE HUD CONTROLS
 # =========================================================
 st.sidebar.title("Quick Quote AI")
-st.sidebar.markdown("**System Status:** `ACTIVE PUBLIC CONSOLE`")
+st.sidebar.markdown("**System Status:** ACTIVE PUBLIC CONSOLE")
 st.sidebar.markdown("---")
 
 user_trade = st.sidebar.selectbox(
@@ -102,7 +103,7 @@ if page_selection == "AI Estimate Engine":
         elif not os.environ.get("OPENAI_API_KEY"):
             st.error("System Matrix Configuration Warning: API Key missing.")
         else:
-            st.write("🔄 Activating Real-Time Price Indexing and calculating regional rates...")
+            st.write("Activating Real-Time Price Indexing and calculating regional rates...")
             try:
                 client = OpenAI()
                 system_prompt = (
@@ -167,22 +168,21 @@ elif page_selection == "Workspace Profiler & Ledger":
     col_prof1, col_prof2 = st.columns(2)
     
     with col_prof1:
-        st.markdown("### 📋 Crew Specifications")
+        st.markdown("### Crew Specifications")
         with st.container(border=True):
             st.session_state['base_labor_rate'] = st.number_input("Base Crew Labor Rate ($ / Hour)", min_value=10.0, max_value=500.0, value=st.session_state['base_labor_rate'], step=5.0)
             st.session_state['company_markup'] = st.number_input("Company Profit Markup Margin (%)", min_value=0.0, max_value=200.0, value=st.session_state['company_markup'], step=2.5)
         
-        st.markdown("### 🏷️ Corporate Identity Branding")
+        st.markdown("### Corporate Identity Branding")
         with st.container(border=True):
             st.session_state['company_name'] = st.text_input("Business / Contracting Firm Name", value=st.session_state['company_name'])
             uploaded_file = st.file_uploader("Upload Company Logo (PNG / JPG Profile)", type=["png", "jpg", "jpeg"])
             if uploaded_file is not None:
                 st.session_state['uploaded_logo'] = uploaded_file.read()
-                st.success("🎉 Corporate Branding Asset Connected Successfully to Active Workspace!")
+                st.success("Corporate Branding Asset Connected Successfully to Active Workspace!")
             
     with col_prof2:
-        st.markdown("### 🗄️ Session Project Ledger")
+        st.markdown("### Session Project Ledger")
         if not st.session_state['quotes_history']:
             st.info("No active project quotes running inside this workspace session.")
         else:
-            st.write("Running calculation log registry:")
