@@ -35,7 +35,7 @@ current_usage = st.session_state['quotes_generated_this_month']
 # MONITOR 1: THE SIDEBAR INTERACTIVE HUD CONTROLS
 # =========================================================
 st.sidebar.title("Quick Quote AI")
-st.sidebar.markdown("**Current Tier:** Free Test Tier")
+st.sidebar.markdown("**System Status:** ACTIVE PUBLIC CONSOLE")
 st.sidebar.markdown(f"**Usage Allocation:** {current_usage} / {LIMIT_MAX} Used This Month")
 st.sidebar.markdown("---")
 
